@@ -1,0 +1,16 @@
+<header>
+  <nav>
+    <div fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center center">
+      <div fxFlex="40">
+        <a mat-raised-button *ngFor="let item of topMenuItems" (click)="onSelect(item.link)">
+          {{item.name | uppercase}}
+        </a>
+      </div>
+      <div fxFlex class="text-right">
+        <span *ngIf="auth.isAuthorized()">{{auth.getUserName()}}</span>
+        <a *ngIf="!auth.isAuthorized()" routerLink="login">login</a>
+        <a *ngIf="auth.isAuthorized()" (click)="logout()">logout</a>
+      </div>
+    </div>
+  </nav>
+</header>

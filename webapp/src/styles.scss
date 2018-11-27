@@ -1,0 +1,153 @@
+/* Angular material theme */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+@import '../node_modules/bootstrap/scss/bootstrap';
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+a, .cp {
+  cursor: pointer;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 300;
+  padding: 1em 0 0;
+}
+
+.flex-spacer {
+  flex-grow: 1;
+}
+
+.progress-spinner {
+  height: 60px !important;
+  margin: 2em auto;
+}
+
+snack-bar-container {
+  background: #3f51b5 !important;
+}
+
+.mat-menu-content {
+  background: #3f51b5;
+}
+
+.mat-menu-item, .mat-menu-item .mat-icon {
+  color: white;
+  font-weight: 100;
+}
+
+.hero-actions {
+  align-items: center;
+  display: flex;
+  padding-bottom: 1em;
+}
+
+.like-icon {
+  color: #DC143C;
+  cursor: pointer;
+}
+
+.mat-raised-button[disabled] {
+  background: #bbb !important;
+}
+
+.mat-dialog-container {
+  background: #3f51b5;
+  color: white;
+}
+
+.mat-dialog-content {
+  text-align: center;
+  padding: 1em 24px !important;
+}
+
+.mat-dialog-title {
+  text-align: center;
+}
+
+.hero-header-image {
+  background-size: cover;
+}
+
+.mat-card-image {
+  margin-bottom: -28px !important;
+  border-top: 1px solid #eee;
+}
+
+.mat-list-avatar {
+  height: 55px !important;
+  width: 55px !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.material-icons.md-72 {
+  font-size: 72px;
+}
+
+.material-icons.md-18 {
+  font-size: 18px;
+}
+
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, menu, nav, section {
+    display: block;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    line-height: 1;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
