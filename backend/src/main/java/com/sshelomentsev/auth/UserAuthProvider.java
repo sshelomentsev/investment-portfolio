@@ -32,15 +32,16 @@ public class UserAuthProvider implements AuthProvider {
                     .get();
             db.query(query, bindVars, event -> {
                 if (event.succeeded() && 1 == event.result().size()) {
-                    future.complete(true);
+                    System.out.println(event.result().getJsonObject(0).encodePrettily());
+                    future.complete(event.result().getJsonObject(0));
                 } else {
-                    future.fail("Not auth");
+                    future.fail("{'res': 'Not auth'}");
                 }
             });
         }, event -> {
-            System.out.println("auth");
             if (event.succeeded()) {
-                handler.handle(Future.succeededFuture(new User(this)));
+                System.out.println(event.result().getClass().getName());
+                handler.handle(Future.succeededFuture(new User(this, (JsonObject) event.result())));
             } else {
                 handler.handle(Future.failedFuture("No"));
             }

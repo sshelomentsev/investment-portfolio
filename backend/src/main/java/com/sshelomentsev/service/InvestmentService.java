@@ -1,9 +1,19 @@
 package com.sshelomentsev.service;
 
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
 public interface InvestmentService {
 
-    boolean buyCoins(String buyer, String currency, Double amount);
+    InvestmentService buyCoins(String buyer, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler);
 
-    boolean sellCoins(String seller, String currency, Double amount);
+    InvestmentService sellCoins(String seller, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler);
+
+    InvestmentService getTransactionsHistory(String user, Handler<AsyncResult<JsonArray>> resultHandler);
+
+    InvestmentService getInvestmentPortfolio(String user, Handler<AsyncResult<JsonArray>> resultHandler);
 
 }

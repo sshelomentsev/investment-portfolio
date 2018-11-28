@@ -10,9 +10,11 @@ import io.vertx.ext.auth.AuthProvider;
 public class User extends AbstractUser {
 
     private UserAuthProvider authProvider;
+    private JsonObject principal;
 
-    public User(UserAuthProvider authProvider) {
+    public User(UserAuthProvider authProvider, JsonObject principal) {
         this.authProvider = authProvider;
+        this.principal = principal;
     }
 
     @Override
@@ -23,9 +25,7 @@ public class User extends AbstractUser {
 
     @Override
     public JsonObject principal() {
-        JsonObject p = new JsonObject();
-        //p.put("email", "aaa");
-        return p;
+        return principal;
     }
 
     @Override
