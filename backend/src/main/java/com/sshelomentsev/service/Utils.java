@@ -29,4 +29,28 @@ public class Utils {
         };
     }
 
+    public static AsyncResult<JsonArray> createFailureResult(String errorMessage) {
+        return new AsyncResult<JsonArray>() {
+            @Override
+            public JsonArray result() {
+                return null;
+            }
+
+            @Override
+            public Throwable cause() {
+                return new IllegalArgumentException(errorMessage);
+            }
+
+            @Override
+            public boolean succeeded() {
+                return false;
+            }
+
+            @Override
+            public boolean failed() {
+                return true;
+            }
+        };
+    }
+
 }
