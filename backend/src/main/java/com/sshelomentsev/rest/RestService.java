@@ -68,7 +68,7 @@ public class RestService extends AbstractVerticle {
         authHandler.addAuthority("whatever");
 
         statisticsService = new StatisticsServiceImpl(vertx, db).initialize(event -> {});
-        investmentService = new InvestmentServiceImpl(vertx, db, statisticsService);
+        investmentService = new InvestmentServiceImpl(vertx, db, statisticsService).initialize(event -> {});
         authService = new AuthServiceImpl(vertx, db);
 
         client = WebClient.create(vertx);
@@ -278,11 +278,4 @@ public class RestService extends AbstractVerticle {
         return "https://api.cryptometr.io/api/v1/metrics-data/market-cap?currency=" + currency;
     }
 
-    private static String getPriceUrl(String currency) {
-        return "https://api.cryptometr.io/api/v1/snapshots/ticker?from=" + currency + "&to=USD";
-    }
-
-    private static String getSnapshotsUrl(String currency) {
-        return "https://api.cryptometr.io/api/v1/snapshots/chart?from=" + currency + "&to=USD&period=day";
-    }
 }

@@ -114,5 +114,4 @@ public class StatisticsServiceImpl implements StatisticsService {
         return "https://api.cryptometr.io/api/v1/snapshots/chart?from=" + currency + "&to=USD&period=" + period;
     }
 
-
 }

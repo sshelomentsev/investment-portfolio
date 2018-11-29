@@ -13,8 +13,11 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.Vertx;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InvestmentServiceImpl implements InvestmentService {
 
@@ -24,6 +27,8 @@ public class InvestmentServiceImpl implements InvestmentService {
     private final Database db;
     private final StatisticsService statisticsService;
 
+    private List<String> currencies = new ArrayList<>();
+
     public InvestmentServiceImpl(Vertx vertx, Database db, StatisticsService statisticsService) {
         this.vertx = vertx;
         this.db = db;
@@ -31,17 +36,38 @@ public class InvestmentServiceImpl implements InvestmentService {
     }
 
     @Override
+    public InvestmentService initialize(Handler<AsyncResult<Void>> resultHandler) {
+        db.query("for c in currency return {code: c.code}", event -> {
+            if (event.succeeded()) {
+                currencies = event.result()
+                        .stream().map(s -> ((JsonObject) s).getString("code"))
+                        .collect(Collectors.toList());
+                resultHandler.handle(null);
+            }
+        });
+        return this;
+    }
+
+    @Override
     public InvestmentService buyCoins(String buyer, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler) {
-        Transaction transaction = new Transaction(buyer, currency, amount, Operation.BUY);
-        db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
+        final Transaction transaction = new Transaction(buyer, currency, amount, Operation.BUY);
+        processTransaction(transaction, resultHandler);
         return this;
     }
 
     @Override
     public InvestmentService sellCoins(String seller, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler) {
-        Transaction transaction = new Transaction(seller, currency, amount, Operation.SELL);
-        db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
+        final Transaction transaction = new Transaction(seller, currency, amount, Operation.SELL);
+        processTransaction(transaction, resultHandler);
         return this;
+    }
+
+    private void processTransaction(Transaction transaction, Handler<AsyncResult<JsonObject>> resultHandler) {
+        if (currencies.contains(transaction.getCurrency())) {
+            db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
+        } else {
+            resultHandler.handle(Utils.createFailureResult2("Specified currency does not exist"));
+        }
     }
 
     @Override

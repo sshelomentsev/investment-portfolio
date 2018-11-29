@@ -26,7 +26,7 @@ public class Database {
                 builder.host(options.getString("host"), options.getInteger("port"));
                 builder.user(options.getString("user"));
                 builder.password(options.getString("password"));
-                builder.maxConnections(options.getInteger("maxConnections"));
+                builder.maxConnections(options.getInteger("maxConnections", 20));
 
                 database = builder.build().db(options.getString("name"));
             } catch (Exception e) {
