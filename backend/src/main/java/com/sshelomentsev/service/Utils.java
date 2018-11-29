@@ -2,6 +2,7 @@ package com.sshelomentsev.service;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public class Utils {
 
@@ -25,6 +26,30 @@ public class Utils {
             @Override
             public boolean failed() {
                 return false;
+            }
+        };
+    }
+
+    public static AsyncResult<JsonObject> createFailureResult2(String errorMessage) {
+        return new AsyncResult<JsonObject>() {
+            @Override
+            public JsonObject result() {
+                return null;
+            }
+
+            @Override
+            public Throwable cause() {
+                return new IllegalArgumentException(errorMessage);
+            }
+
+            @Override
+            public boolean succeeded() {
+                return false;
+            }
+
+            @Override
+            public boolean failed() {
+                return true;
             }
         };
     }

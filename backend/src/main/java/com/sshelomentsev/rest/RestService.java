@@ -3,8 +3,11 @@ package com.sshelomentsev.rest;
 import com.sshelomentsev.arangodb.Database;
 import com.sshelomentsev.auth.RxAuthProvider;
 import com.sshelomentsev.auth.UserAuthProvider;
+import com.sshelomentsev.model.UserProfile;
+import com.sshelomentsev.service.AuthService;
 import com.sshelomentsev.service.InvestmentService;
 import com.sshelomentsev.service.StatisticsService;
+import com.sshelomentsev.service.impl.AuthServiceImpl;
 import com.sshelomentsev.service.impl.InvestmentServiceImpl;
 import com.sshelomentsev.service.impl.StatisticsServiceImpl;
 import com.sshelomentsev.util.Runner;
@@ -44,6 +47,7 @@ public class RestService extends AbstractVerticle {
     private Database db;
     private InvestmentService investmentService;
     private StatisticsService statisticsService;
+    private AuthService authService;
     private WebClient client;
 
     @Override
@@ -63,8 +67,9 @@ public class RestService extends AbstractVerticle {
         AuthHandler authHandler = BasicAuthHandler.create(provider);
         authHandler.addAuthority("whatever");
 
-        statisticsService = new StatisticsServiceImpl(vertx, db);
+        statisticsService = new StatisticsServiceImpl(vertx, db).initialize(event -> {});
         investmentService = new InvestmentServiceImpl(vertx, db, statisticsService);
+        authService = new AuthServiceImpl(vertx, db);
 
         client = WebClient.create(vertx);
         Router router = Router.router(vertx);
@@ -89,10 +94,13 @@ public class RestService extends AbstractVerticle {
             ctx.response().setStatusCode(302).end();
         });
 
+        router.post("/api/users/signup").handler(createUserAccount());
+
         router.get("/api/v1/currencies").handler(createCurrenciesHandler());
 
         router.get("/api/v1/ticks").handler(createTicksHandler());
         router.get("/api/v1/snapshots/:period").handler(createSnapshotsHandler());
+        router.get("/api/v1/snapshots/:currency/:period").handler(createSnapshotsHandler2());
         router.get("/api/v1/marketcap").handler(createMarkerCapHandler());
 
         router.post("/api/v1/coins/buy").handler(createBuyCoinsHandler());
@@ -103,6 +111,23 @@ public class RestService extends AbstractVerticle {
         router.get("/api/v1/portfolio").handler(createInvestmentPortfolioHandler());
 
         vertx.createHttpServer().requestHandler(router::accept).listen(8888);
+    }
+
+    private Handler<RoutingContext> createUserAccount() {
+        return ctx -> {
+            try {
+                UserProfile profile = ctx.getBodyAsJson().mapTo(UserProfile.class);
+                authService.createUser(profile, event -> {
+                    if (event.succeeded()) {
+                        ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
+                    } else {
+                        ctx.response().setStatusCode(400).end();
+                    }
+                });
+            } catch (IllegalArgumentException e) {
+                ctx.response().setStatusCode(400).end();
+            }
+        };
     }
 
     private Handler<RoutingContext> createInvestmentPortfolioHandler() {
@@ -121,7 +146,6 @@ public class RestService extends AbstractVerticle {
             db.query("for c in currency return {code: c.code}", event -> {
                 if (event.succeeded()) {
                     System.out.println(event.result().encodePrettily());
-                    List<String> currencies = event.result().stream().map(s -> ((JsonObject) s).getString("code")).collect(Collectors.toList());
                     ctx.response().end();
                 } else {
                     event.cause().printStackTrace();
@@ -185,30 +209,30 @@ public class RestService extends AbstractVerticle {
 
     private Handler<RoutingContext> createSnapshotsHandler() {
         return ctx -> {
-            String period = ctx.request().getParam("period");
-            if ("day".equals(period) || "month".equals(period) || "week".equals(period)) {
-                List<Observable<JsonObject>> observables = Arrays.stream(currencies)
-                        .map(currency -> client.getAbs(getSnapshotsUrl(currency))
-                                .rxSend()
-                                .toObservable()
-                                .map(resp -> new JsonObject().put(currency, resp.bodyAsJsonArray())))
-                        .collect(Collectors.toList());
-
-                Observable.zip(observables, jsons -> {
-                    JsonArray ret = new JsonArray();
-                    for (Object json : jsons) {
-                        ret.add(json);
-                    }
-                    return ret;
-                }).subscribe(res -> ctx
-                        .response()
-                        .putHeader("Content-type", "application/json")
-                        .end(res.encodePrettily()));
-            } else {
-                ctx.response().setStatusCode(400).end();
-            }
+            statisticsService.getSnapshots(ctx.request().getParam("period"), event -> {
+                if (event.succeeded()) {
+                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
+                } else {
+                    event.cause().printStackTrace();
+                    ctx.response().setStatusCode(400).end();
+                }
+            });
         };
+    }
 
+    private Handler<RoutingContext> createSnapshotsHandler2() {
+        return ctx -> {
+            final String period = ctx.request().getParam("period");
+            final String currency = ctx.request().getParam("currency");
+            statisticsService.getSnapshots(currency, period, event -> {
+                if (event.succeeded()) {
+                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
+                } else {
+                    event.cause().printStackTrace();
+                    ctx.response().setStatusCode(400).end();
+                }
+            });
+        };
     }
 
     private Handler<RoutingContext> createMarkerCapHandler() {

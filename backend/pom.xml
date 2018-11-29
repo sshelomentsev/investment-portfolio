@@ -11,6 +11,7 @@
     <java.version>1.8</java.version>
     <vertx.version>3.5.4</vertx.version>
     <arango.driver.version>5.0.1</arango.driver.version>
+    <bcrypt.version>0.6.0</bcrypt.version>
   </properties>
 
   <dependencies>
@@ -48,6 +49,11 @@
       <groupId>com.arangodb</groupId>
       <artifactId>arangodb-java-driver</artifactId>
       <version>${arango.driver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>at.favre.lib</groupId>
+      <artifactId>bcrypt</artifactId>
+      <version>${bcrypt.version}</version>
     </dependency>
   </dependencies>
 

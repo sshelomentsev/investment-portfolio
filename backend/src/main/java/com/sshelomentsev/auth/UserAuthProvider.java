@@ -1,5 +1,6 @@
 package com.sshelomentsev.auth;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.arangodb.util.MapBuilder;
 import com.sshelomentsev.arangodb.Database;
 import io.vertx.core.AsyncResult;
@@ -21,19 +22,23 @@ public class UserAuthProvider implements AuthProvider {
         this.vertx = vertx;
         this.db = db;
     }
-
     @Override
     public void authenticate(JsonObject authInfo, Handler<AsyncResult<io.vertx.ext.auth.User>> handler) {
         vertx.executeBlocking(future -> {
-            final String query = "for u in user filter u.email == @email and u.password == @password return u";
+            final String query = "for u in user filter u.email == @email return u";
             Map<String, Object> bindVars = new MapBuilder()
                     .put("email", authInfo.getString("username"))
-                    .put("password", authInfo.getString("password"))
                     .get();
             db.query(query, bindVars, event -> {
                 if (event.succeeded() && 1 == event.result().size()) {
-                    System.out.println(event.result().getJsonObject(0).encodePrettily());
-                    future.complete(event.result().getJsonObject(0));
+                    String hash = event.result().getJsonObject(0).getString("password");
+                    BCrypt.Result result = BCrypt.verifyer().verify(authInfo.getString("password").toCharArray(), hash);
+                    if (result.verified) {
+                        System.out.println(event.result().getJsonObject(0).encodePrettily());
+                        future.complete(event.result().getJsonObject(0));
+                    } else {
+                        future.fail("{'res': 'user in not correct}");
+                    }
                 } else {
                     future.fail("{'res': 'Not auth'}");
                 }

@@ -45,6 +45,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public StatisticsService getSnapshots(String period, Handler<AsyncResult<JsonArray>> resultHandler) {
+        System.out.println("Get!");
         getSnapshotsForCurrencies(currencies, period, resultHandler);
 
         return this;
@@ -80,12 +81,15 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private void getSnapshotsForCurrencies(List<String> currencies, String period, Handler<AsyncResult<JsonArray>> resultHandler) {
+        System.out.println("Get2");
         if ("day".equals(period) || "month".equals(period) || "week".equals(period)) {
+            System.out.println("Get3");
+            currencies.forEach(c -> System.out.println(c));
             List<Observable<JsonObject>> observables = currencies.stream()
                     .map(currency -> client.getAbs(getSnapshotsUrl(currency, period))
                             .rxSend()
                             .toObservable()
-                            .map(resp -> new JsonObject().put(currency, resp.bodyAsJsonArray())))
+                            .map(resp -> new JsonObject().put("currency", currency).put("values", resp.bodyAsJsonArray())))
                     .collect(Collectors.toList());
 
             Observable.zip(observables, jsons -> {
@@ -106,6 +110,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private static String getSnapshotsUrl(String currency, String period) {
+        System.out.println("price url " + System.currentTimeMillis());
         return "https://api.cryptometr.io/api/v1/snapshots/chart?from=" + currency + "&to=USD&period=" + period;
     }
 

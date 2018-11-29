@@ -11,7 +11,7 @@ public class Transaction {
     private Operation operation;
     private long timestamp;
 
-    public Transaction() {
+    private Transaction() {
         this.timestamp = System.currentTimeMillis();
     }
 
