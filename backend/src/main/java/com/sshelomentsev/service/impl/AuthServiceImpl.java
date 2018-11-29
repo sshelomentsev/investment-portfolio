@@ -25,13 +25,16 @@ public class AuthServiceImpl implements AuthService {
     public AuthService createUser(UserProfile userProfile, Handler<AsyncResult<JsonObject>> resultHandler) {
         db.query("for u in user filter user.email == @email return u",
                 new MapBuilder().put("email", userProfile.getEmail()).get(), event -> {
-            if (0 == event.result().size()) {
-                //String bcryptHashString = BCrypt.withDefaults().hashToString(12, userProfile.getPassword().toCharArray());
-                String hashed = BCrypt.hashpw(userProfile.getPassword(), BCrypt.gensalt());
-                userProfile.setPassword(hashed);
-                db.collection("user").insert(JsonObject.mapFrom(userProfile), resultHandler);
+            if (event.succeeded()) {
+                if (0 == event.result().size()) {
+                    String hashed = BCrypt.hashpw(userProfile.getPassword(), BCrypt.gensalt());
+                    userProfile.setPassword(hashed);
+                    db.collection("user").insert(JsonObject.mapFrom(userProfile), resultHandler);
+                } else {
+                    resultHandler.handle(Utils.createFailureResult2("User already exist"));
+                }
             } else {
-                resultHandler.handle(Utils.createFailureResult2("User already exist"));
+                event.cause().printStackTrace();
             }
         });
 
