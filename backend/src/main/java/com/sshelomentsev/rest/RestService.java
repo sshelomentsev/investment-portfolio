@@ -7,16 +7,11 @@ import com.sshelomentsev.model.UserProfile;
 import com.sshelomentsev.service.AuthService;
 import com.sshelomentsev.service.InvestmentService;
 import com.sshelomentsev.service.StatisticsService;
-import com.sshelomentsev.service.impl.AuthServiceImpl;
-import com.sshelomentsev.service.impl.InvestmentServiceImpl;
-import com.sshelomentsev.service.impl.StatisticsServiceImpl;
 import com.sshelomentsev.util.Runner;
 import io.reactivex.Observable;
-import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.ext.web.Router;
@@ -44,20 +39,18 @@ public class RestService extends AbstractVerticle {
         Runner.runExample();
     }
 
-    private Database db;
     private InvestmentService investmentService;
     private StatisticsService statisticsService;
     private AuthService authService;
     private WebClient client;
+    private Database db;
 
-    @Override
-    public void init(Vertx vertx, Context context) {
-        super.init(vertx, context);
-        db = new Database(vertx, context.config().getJsonObject("db"), handler -> {
-            if (handler.succeeded()) {
-                System.out.println("db connected");
-            }
-        });
+    public RestService(InvestmentService investmentService, StatisticsService statisticsService, AuthService authService, Database db) {
+        this.investmentService = investmentService;
+        this.statisticsService = statisticsService;
+        this.authService = authService;
+        this.db = db;
+        this.client = WebClient.create(vertx);
     }
 
     @Override
@@ -67,11 +60,6 @@ public class RestService extends AbstractVerticle {
         AuthHandler authHandler = BasicAuthHandler.create(provider);
         authHandler.addAuthority("whatever");
 
-        statisticsService = new StatisticsServiceImpl(vertx, db).initialize(event -> {});
-        investmentService = new InvestmentServiceImpl(vertx, db, statisticsService).initialize(event -> {});
-        authService = new AuthServiceImpl(vertx, db);
-
-        client = WebClient.create(vertx);
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
         router.route().produces("application/json");
@@ -85,7 +73,7 @@ public class RestService extends AbstractVerticle {
 
         router.route().handler(UserSessionHandler.create(provider));
 
-        router.route("/api/v1/*").handler(authHandler);
+        //router.route("/api/v1/*").handler(authHandler);
 
         router.route("/api/users/login/").handler(authHandler);
         router.get("/api/users/login").handler(createUserAuthHandler());
@@ -96,11 +84,9 @@ public class RestService extends AbstractVerticle {
 
         router.post("/api/users/signup").handler(createUserAccount());
 
-        router.get("/api/v1/currencies").handler(createCurrenciesHandler());
-
         router.get("/api/v1/ticks").handler(createTicksHandler());
         router.get("/api/v1/snapshots/:period").handler(createSnapshotsHandler());
-        router.get("/api/v1/snapshots/:currency/:period").handler(createSnapshotsHandler2());
+        //router.get("/api/v1/snapshots/:currency/:period").handler(createSnapshotsHandler2());
         router.get("/api/v1/marketcap").handler(createMarkerCapHandler());
 
         router.post("/api/v1/coins/buy").handler(createBuyCoinsHandler());
@@ -135,21 +121,6 @@ public class RestService extends AbstractVerticle {
             investmentService.getInvestmentPortfolio(getUserId(ctx), event -> {
                 if (event.succeeded()) {
                     ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
-                }
-            });
-        };
-    }
-
-
-    private Handler<RoutingContext> createCurrenciesHandler() {
-        return ctx -> {
-            db.query("for c in currency return {code: c.code}", event -> {
-                if (event.succeeded()) {
-                    System.out.println(event.result().encodePrettily());
-                    ctx.response().end();
-                } else {
-                    event.cause().printStackTrace();
-                    ctx.response().setStatusCode(400).end();
                 }
             });
         };

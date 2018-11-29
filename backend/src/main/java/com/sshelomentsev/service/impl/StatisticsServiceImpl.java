@@ -29,7 +29,6 @@ public class StatisticsServiceImpl implements StatisticsService {
         client = WebClient.create(vertx);
     }
 
-
     @Override
     public StatisticsService initialize(Handler<AsyncResult<Void>> resultHandler) {
         db.query("for c in cryptoCurrency return {code: c.code}", event -> {
@@ -38,6 +37,8 @@ public class StatisticsServiceImpl implements StatisticsService {
                         .stream().map(s -> ((JsonObject) s).getString("code"))
                         .collect(Collectors.toList());
                 resultHandler.handle(null);
+            } else {
+                event.cause().printStackTrace();
             }
         });
         return this;
@@ -45,7 +46,6 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public StatisticsService getSnapshots(String period, Handler<AsyncResult<JsonArray>> resultHandler) {
-        System.out.println("Get!");
         getSnapshotsForCurrencies(currencies, period, resultHandler);
 
         return this;
@@ -81,9 +81,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private void getSnapshotsForCurrencies(List<String> currencies, String period, Handler<AsyncResult<JsonArray>> resultHandler) {
-        System.out.println("Get2");
         if ("day".equals(period) || "month".equals(period) || "week".equals(period)) {
-            System.out.println("Get3");
             currencies.forEach(c -> System.out.println(c));
             List<Observable<JsonObject>> observables = currencies.stream()
                     .map(currency -> client.getAbs(getSnapshotsUrl(currency, period))
