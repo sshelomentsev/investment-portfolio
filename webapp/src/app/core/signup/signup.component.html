@@ -1,3 +1,74 @@
-<p>
-  signup works!
-</p>
+<div class="container" style="max-width:800px">
+  <h2 style="border-bottom: 1px solid">Welcome in Investor Onboarding</h2>
+
+  <form (ngSubmit)="signup()" #signupForm="ngForm">
+      <div>
+          <mat-form-field>
+            <input matInput placeholder="First Name">
+          </mat-form-field>
+
+          <mat-form-field>
+            <input matInput placeholder="Second Name">
+          </mat-form-field>
+        </div>
+
+        <div >
+          <mat-form-field>
+            <input matInput placeholder="Email">
+          </mat-form-field>
+        </div>
+
+        <div >
+          <mat-form-field>
+            <input matInput placeholder="Create password">
+          </mat-form-field>
+
+          <mat-form-field>
+            <input matInput placeholder="Confirm password">
+          </mat-form-field>
+        </div>
+
+        <div >
+          <mat-form-field>
+            <input matInput placeholder="Phone number">
+          </mat-form-field>
+        </div>
+  </form>
+
+
+
+  <form (ngSubmit)="signup()" #signupForm="ngForm">
+    <div class="form-group row">
+      <div class="col-sm-9">
+        <input id="firstName" type="text" name="firstName" [(ngModel)]="firstName" class="form-control" required
+          placeholder="First Name" />
+
+        <input id="lastName" type="text" name="lastName" [(ngModel)]="lastName" class="form-control" required
+          placeholder="Last Name" />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="login" class="col-form-label col-sm-3">username</label>
+      <div class="col-sm-9">
+        <input id="username" type="text" name="username" [(ngModel)]="username" class="form-control" required
+          placeholder="player@steam.com" />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="password" class="col-form-label col-sm-3">password</label>
+      <div class="col-sm-9">
+        <input id="password" type="password" name="password" [(ngModel)]="password" class="form-control" required />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-9">
+        <button type="submit" class="btn btn-primary">signup</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="example-container">
+
+</div>

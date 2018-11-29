@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class NavigationComponent implements OnInit {
 
-  private readonly topMenuLinks = ['dashboard', 'players', 'teams'];
+  private readonly topMenuLinks = ['Dashboard', 'Fund performance'];
 
   public topMenuItems: any[] = [];
 

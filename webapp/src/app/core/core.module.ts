@@ -11,13 +11,15 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
+import { MaterialModule } from '../shared/modules/material.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    MaterialModule
   ],
   exports: [
     NavigationComponent,
@@ -30,6 +32,9 @@ import { SignupComponent } from './signup/signup.component';
     PageNotFoundComponent,
     LoginComponent,
     SignupComponent
+  ],
+  entryComponents: [
+
   ],
   providers: [
   ]
