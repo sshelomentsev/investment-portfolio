@@ -1,6 +1,5 @@
 package com.sshelomentsev.auth;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.arangodb.util.MapBuilder;
 import com.sshelomentsev.arangodb.Database;
 import io.vertx.core.AsyncResult;
@@ -10,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 
 import io.vertx.ext.auth.AuthProvider;
 import io.vertx.reactivex.core.Vertx;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Map;
 
@@ -32,8 +32,7 @@ public class UserAuthProvider implements AuthProvider {
             db.query(query, bindVars, event -> {
                 if (event.succeeded() && 1 == event.result().size()) {
                     String hash = event.result().getJsonObject(0).getString("password");
-                    BCrypt.Result result = BCrypt.verifyer().verify(authInfo.getString("password").toCharArray(), hash);
-                    if (result.verified) {
+                    if (BCrypt.checkpw((authInfo.getString("password")), hash)) {
                         System.out.println(event.result().getJsonObject(0).encodePrettily());
                         future.complete(event.result().getJsonObject(0));
                     } else {

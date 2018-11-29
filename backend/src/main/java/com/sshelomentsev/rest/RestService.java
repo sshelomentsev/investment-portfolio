@@ -40,9 +40,11 @@ public class RestService extends AbstractVerticle {
 
     private static final String[] currencies = new String[]{"BTC", "ETH", "XRP", "LTC", "DASH"};
 
+    /*
     public static void main(String... args) {
         Runner.runExample();
     }
+    */
 
     private Database db;
     private InvestmentService investmentService;
