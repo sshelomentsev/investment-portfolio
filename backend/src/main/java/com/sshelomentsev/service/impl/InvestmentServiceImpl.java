@@ -37,7 +37,7 @@ public class InvestmentServiceImpl implements InvestmentService {
 
     @Override
     public InvestmentService initialize(Handler<AsyncResult<Void>> resultHandler) {
-        db.query("for c in currency return {code: c.code}", event -> {
+        db.query("for c in cryptoCurrency return {code: c.code}", event -> {
             if (event.succeeded()) {
                 currencies = event.result()
                         .stream().map(s -> ((JsonObject) s).getString("code"))
