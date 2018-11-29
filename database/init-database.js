@@ -1,0 +1,14 @@
+db._createDatabase("investment", {}, [{ username: "investment", passwd: "investment", active: true}]);
+db._useDatabase("investment");
+
+db._create("user");
+
+db._create("currency");
+db.currency.save({code: 'BTC', name: 'Bitcoin'});
+db.currency.save({code: 'XRP', name: 'Ripple'});
+db.currency.save({code: 'ETH', name: 'Etherium'});
+db.currency.save({code: 'DASH', name: 'Dash'});
+db.currency.save({code: 'LTC', name: 'Litecoin'});
+
+db._create("transaction");
+db._create("balance");
