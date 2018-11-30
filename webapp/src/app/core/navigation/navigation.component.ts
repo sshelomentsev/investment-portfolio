@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class NavigationComponent implements OnInit {
 
-  private readonly topMenuLinks = ['Dashboard', 'Fund performance'];
+  private readonly topMenuLinks = ['dashboard', 'Fund performance'];
 
   public topMenuItems: any[] = [];
 
@@ -36,5 +36,9 @@ export class NavigationComponent implements OnInit {
   public logout(): void {
     this.auth.logout();
     this.router.navigate(['/players']);
+  }
+
+  public isAuthorized(): boolean {
+    return this.auth.isAuthorized();
   }
 }

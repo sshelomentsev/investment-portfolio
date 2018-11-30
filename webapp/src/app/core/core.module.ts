@@ -12,6 +12,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { MaterialModule } from '../shared/modules/material.module';
+import { CurrencyCardComponent } from './currency-card/currency-card.component';
+import { SharedModule } from '../shared/modules/shared.module';
+import { CurrentStructureComponent } from './current-structure/current-structure.component';
 
 @NgModule({
   imports: [
@@ -19,19 +22,23 @@ import { MaterialModule } from '../shared/modules/material.module';
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    MaterialModule
+    MaterialModule,
+    SharedModule
   ],
   exports: [
     NavigationComponent,
     FooterComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    CurrencyCardComponent
   ],
   declarations: [
     NavigationComponent,
     FooterComponent,
     PageNotFoundComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    CurrencyCardComponent,
+    CurrentStructureComponent
   ],
   entryComponents: [
 

@@ -7,9 +7,9 @@
         </a>
       </div>
       <div fxFlex class="text-right">
-        <span *ngIf="auth.isAuthorized()">{{auth.getUserName()}}</span>
-        <a *ngIf="!auth.isAuthorized()" routerLink="login">login</a>
-        <a *ngIf="auth.isAuthorized()" (click)="logout()">logout</a>
+        <!--<span *ngIf="auth.isAuthorized()">{{auth.getUserName()}}</span>-->
+        <a *ngIf="!isAuthorized()" routerLink="login">login</a>
+        <a *ngIf="isAuthorized()" (click)="logout()">logout</a>
       </div>
     </div>
   </nav>
