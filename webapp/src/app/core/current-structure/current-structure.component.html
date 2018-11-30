@@ -35,12 +35,12 @@
 <div class="twoColFlex">
   <div class="col left-col">
     <div *ngFor="let coin of getCurrentStructure(0)">
-      <coin-card [coin]="coin"></coin-card>
+      <coin-card [coin]="coin" (onBuy)="buy($event)" (onSell)="sell($event)"></coin-card>
     </div>
   </div>
   <div class="col right-col">
     <div *ngFor="let coin of getCurrentStructure(1)">
-      <coin-card [coin]="coin"></coin-card>
+      <coin-card [coin]="coin" (onBuy)="buy($event)" (onSell)="sell($event)"></coin-card>
     </div>
   </div>
 

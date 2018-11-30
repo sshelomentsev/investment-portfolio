@@ -15,6 +15,7 @@ import { MaterialModule } from '../shared/modules/material.module';
 import { SharedModule } from '../shared/shared.module';
 import { CurrentStructureComponent } from './current-structure/current-structure.component';
 import { CoinCardComponent } from './coin-card/coin-card.component';
+import { OperationDialogComponent } from './operation-dialog/operation-dialog.component';
 
 @NgModule({
   imports: [
@@ -38,10 +39,11 @@ import { CoinCardComponent } from './coin-card/coin-card.component';
     LoginComponent,
     SignupComponent,
     CurrentStructureComponent,
-    CoinCardComponent
+    CoinCardComponent,
+    OperationDialogComponent
   ],
   entryComponents: [
-
+    OperationDialogComponent
   ],
   providers: [
   ]

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import {animate, state, style, transition, trigger} from '@angular/animations';
+import { MatDialog } from '@angular/material';
+
 import { DataService } from 'src/app/common/data.service';
 import { StakingCoin } from '../../model/staking-coin.model';
+import { OperationDialogComponent } from '../operation-dialog/operation-dialog.component';
 
 @Component({
   selector: 'app-current-structure',
@@ -14,7 +16,7 @@ export class CurrentStructureComponent implements OnInit {
 
   private data: StakingCoin[] = [];
 
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService, public dialog: MatDialog) { }
 
   ngOnInit() {
     this.dataService.getStackingCoins().then(res => {
@@ -29,6 +31,28 @@ export class CurrentStructureComponent implements OnInit {
 
   getCurrentStructure(flag: number): StakingCoin[] {
     return this.data.filter((coin, i) => (i % 2) == flag);
+  }
+
+  buy(event) {
+    console.log(event);
+    this.openDialog(event, 'buy');
+  }
+
+  sell(event) {
+    console.log('sell');
+    console.log(event);
+    this.openDialog(event, 'sell');
+  }
+
+  openDialog(code: string, operation: string) {
+    const dialogRef = this.dialog.open(OperationDialogComponent, {
+      width: '400px',
+      data: {code: code, operation: operation}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
 }

@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>{{operationName}} {{data.code}}</h1>
+<div mat-dialog-content>
+  <p>How much coins do you want to {{data.operation}}</p>
+  <mat-form-field>
+    <input matInput [(ngModel)]="amount">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>{{operationName}}</button>
+</div>
