@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import { DataService } from 'src/app/common/data.service';
+import { StakingCoin } from '../../model/staking-coin.model';
 
 @Component({
   selector: 'app-current-structure',
@@ -9,44 +11,24 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 export class CurrentStructureComponent implements OnInit {
 
   displayedColumns: string[] = ['coin', 'amount', 'usd', 'percent'];
-  dataSource = ELEMENT_DATA;
 
-  constructor() { }
+  private data: StakingCoin[] = [];
+
+  constructor(private dataService: DataService) { }
 
   ngOnInit() {
+    this.dataService.getStackingCoins().then(res => {
+      console.log(res);
+      this.data = res.sort((a, b) => b.rate - a.rate);
+    });
+  }
+
+  getStakingCoins(): StakingCoin[] {
+    return this.data.filter(coin => coin.amountCrypto > 0);;
+  }
+
+  getCurrentStructure(flag: number): StakingCoin[] {
+    return this.data.filter((coin, i) => (i % 2) == flag);
   }
 
 }
-
-export class StakingCoin {
-  code: string;
-  name: string;
-  amountCrypto: number;
-  amountFiat: number;
-  percent: number;
-}
-
-const ELEMENT_DATA: StakingCoin[] = [
-  {
-    code: 'BTC',
-    name: 'Bitcoin',
-    amountCrypto: 1.12,
-    amountFiat: 4824.12,
-    percent: 35
-  },
-  {
-    code: 'ETH',
-    name: 'Ethereum',
-    amountCrypto: 1.1237676,
-    amountFiat: 4824.12,
-    percent: 35
-  },
-  {
-    code: 'XRP',
-    name: 'Ripple',
-    amountCrypto: 1.12,
-    amountFiat: 4824.12,
-    percent: 11
-  }
-];
-

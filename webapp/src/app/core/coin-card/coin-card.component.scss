@@ -1,0 +1,68 @@
+.coin-card {
+  margin: 4px;
+}
+
+.currency-title {
+  width: 60px;
+}
+
+.coin-title-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.btc {
+  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/btc.svg)
+}
+
+.eth {
+  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/eth.svg)
+}
+
+.xrp {
+  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/xrp.svg)
+}
+
+.ltc {
+  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/ltc.svg)
+}
+
+.dash {
+  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/dash.svg)
+}
+
+.staking-amount {
+  padding-left: 40px;
+}
+
+.change-by-period {
+  height: 100%;
+  width: 175px;
+  flex-grow: 0;
+  display: inline-block;
+  font-family: 'Allerta', serif;
+  font-size: 11px;
+  color: gray;
+}
+
+.change {
+  font-size: 18px;
+}
+
+.gain {
+  color: green;
+}
+
+.loose {
+  color: red;
+}
+
+.market-stats {
+  height: 100%;
+  width: 145px;
+  flex-grow: 0;
+  display: inline-block;
+  font-family: 'Allerta', serif;
+  font-size: 11px;
+  color: gray;
+}

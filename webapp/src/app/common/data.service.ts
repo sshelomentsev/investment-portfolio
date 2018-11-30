@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 
 import { Observable } from 'rxjs';
 import { AuthService } from './auth/auth.service';
+import { StakingCoin } from '../model/staking-coin.model';
 
 @Injectable()
 export class DataService {
@@ -20,6 +21,39 @@ export class DataService {
       this.get(url).subscribe(res => {
         resolve(<Snapshot[]>res.json());
       });
+    });
+  }
+
+  public getStackingCoins(): Promise<StakingCoin[]> {
+    const url = this.getBaseUrl() + 'portfolio';
+    return new Promise<StakingCoin[]>((resolve) => {
+      this.get(url).subscribe(res => {
+        const coins: StakingCoin[] = <StakingCoin[]>res.json();
+        const sum = coins.map(coin => coin.amountFiat).reduce((a, b) => a += b);
+        coins.forEach(coin => coin.percent = (coin.amountFiat / sum) * 100);
+        resolve(coins);
+      });
+    });
+  }
+
+  public buyCoins(currency: string, amount: number): Promise<string> {
+    return this.operateCoins(currency, amount, 'buy');
+  }
+
+  public sellCoins(currency: string, amount: number): Promise<string> {
+    return this.operateCoins(currency, amount, 'sell');
+  }
+
+  private operateCoins(currency: string, amount: number, operation: string): Promise<string> {
+    const url = this.getBaseUrl() + 'coins/' + operation;
+    const info = {
+      currency: currency,
+      amount: amount
+    };
+    return new Promise<string>((resolve) => {
+      this.post(url, info).subscribe(res => {
+        resolve(res.text());
+      })
     });
   }
 

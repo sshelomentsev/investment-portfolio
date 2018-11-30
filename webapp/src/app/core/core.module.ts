@@ -12,9 +12,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { MaterialModule } from '../shared/modules/material.module';
-import { CurrencyCardComponent } from './currency-card/currency-card.component';
 import { SharedModule } from '../shared/shared.module';
 import { CurrentStructureComponent } from './current-structure/current-structure.component';
+import { CoinCardComponent } from './coin-card/coin-card.component';
 
 @NgModule({
   imports: [
@@ -29,7 +29,6 @@ import { CurrentStructureComponent } from './current-structure/current-structure
     NavigationComponent,
     FooterComponent,
     PageNotFoundComponent,
-    CurrencyCardComponent,
     CurrentStructureComponent
   ],
   declarations: [
@@ -38,8 +37,8 @@ import { CurrentStructureComponent } from './current-structure/current-structure
     PageNotFoundComponent,
     LoginComponent,
     SignupComponent,
-    CurrencyCardComponent,
-    CurrentStructureComponent
+    CurrentStructureComponent,
+    CoinCardComponent
   ],
   entryComponents: [
 

@@ -1,0 +1,40 @@
+<mat-card class="coin-card">
+    <mat-card-header>
+      <div mat-card-avatar class="coin-title-icon {{coin.currencyCode.toLowerCase()}}">
+      </div>
+      <div class="currency-title">
+        <mat-card-title>{{coin.currencyName}}</mat-card-title>
+        <mat-card-subtitle>{{coin.currencyCode}}</mat-card-subtitle>
+      </div>
+      <div *ngIf="coin.amountFiat > 0" class="staking-amount">
+        <mat-card-title>{{coin.amountFiat | number: '1.0-2'}}</mat-card-title>
+        <mat-card-subtitle>USD value</mat-card-subtitle>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="change-by-period">
+        <div>1 hour change</div>
+        <div class="change {{coin.hourChange > 0 ? 'gain' : 'loose'}}">{{coin.hourChange | number: '1.0-2' |
+          periodChange}}</div>
+      </div>
+
+      <div class="change-by-period">
+        <div>24 hour change</div>
+        <div class="change {{coin.dayChange > 0 ? 'gain' : 'loose'}}">{{coin.dayChange | number: '1.0-2' |
+          periodChange}}</div>
+      </div>
+
+      <div class="change-by-period">
+        <div>1 week change</div>
+        <div class="change {{coin.weekChange > 0 ? 'gain' : 'loose'}}">{{coin.weekChange | number: '1.0-2' |
+          periodChange}}</div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-button (click)="buy()">Buy</button>
+      <button mat-button (click)="sell()">Sell</button>
+    </mat-card-actions>
+
+  </mat-card>

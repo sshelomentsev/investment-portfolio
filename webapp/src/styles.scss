@@ -99,6 +99,11 @@ snack-bar-container {
   font-size: 18px;
 }
 
+body {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+}
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -123,7 +128,7 @@ time, mark, audio, video {
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, menu, nav, section {
-    display: block;
+    //display: block;
 }
 
 html, body {
@@ -160,7 +165,7 @@ table {
   flex-wrap: wrap;
   align-content: stretch;
   .col {
-    width: 400px;
+    width: 600px;
     min-width: 200px;
     margin: 0 20px 20px 20px;
   }
