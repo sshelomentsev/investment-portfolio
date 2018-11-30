@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, Response, RequestOptions} from '@angular/http';
 
 import { Snapshot } from '../model/snapshot.model';
+import { Transaction } from '../model/transaction.model';
 
 import { environment } from '../../environments/environment';
 
@@ -57,8 +58,11 @@ export class DataService {
     });
   }
 
-  private getBaseUrl(): string {
-    return environment.apiUrl;
+  public getTransactions(): Promise<Transaction[]> {
+    const url = this.getBaseUrl() + 'coins/transactions';
+    return new Promise<any>((resolve) => {
+      this.get(url).subscribe(res => resolve(res.json()));
+    });
   }
 
   private post(url: string, body: any): Observable<Response> {
@@ -78,6 +82,10 @@ export class DataService {
       headers: headers
     });
     return this.http.get(url, options);
+  }
+
+  private getBaseUrl(): string {
+    return environment.apiUrl;
   }
 
 }

@@ -2,6 +2,8 @@ import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
+import { MomentModule } from 'ngx-moment';
+
 import { throwIfAlreadyLoaded } from './module-import.guard';
 
 import { NavigationComponent } from './navigation/navigation.component';
@@ -17,6 +19,7 @@ import { CurrentStructureComponent } from './current-structure/current-structure
 import { CoinCardComponent } from './coin-card/coin-card.component';
 import { OperationDialogComponent } from './operation-dialog/operation-dialog.component';
 import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
+import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';
 
 @NgModule({
   imports: [
@@ -25,13 +28,15 @@ import { NotificationDialogComponent } from './notification-dialog/notification-
     ReactiveFormsModule,
     RouterModule,
     MaterialModule,
-    SharedModule
+    SharedModule,
+    MomentModule
   ],
   exports: [
     NavigationComponent,
     FooterComponent,
     PageNotFoundComponent,
-    CurrentStructureComponent
+    CurrentStructureComponent,
+    MomentModule
   ],
   declarations: [
     NavigationComponent,
@@ -42,7 +47,8 @@ import { NotificationDialogComponent } from './notification-dialog/notification-
     CurrentStructureComponent,
     CoinCardComponent,
     OperationDialogComponent,
-    NotificationDialogComponent
+    NotificationDialogComponent,
+    TransactionHistoryComponent
   ],
   entryComponents: [
     OperationDialogComponent,

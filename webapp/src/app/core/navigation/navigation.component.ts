@@ -11,17 +11,23 @@ import { Router } from '@angular/router';
 })
 export class NavigationComponent implements OnInit {
 
-  private readonly topMenuLinks = ['dashboard', 'Fund performance'];
-
-  public topMenuItems: any[] = [];
+  public topMenuItems: any[] = [{
+    link: 'performance',
+    name: 'Fund performance'
+  },
+  {
+    link: 'transactions',
+    name: 'Transactions'
+  },
+  {
+    link: 'profile',
+    name: 'Profile'
+  }];
 
   constructor(private auth: AuthService, private router: Router) {
-    this.topMenuItems = this.topMenuLinks.map((link) => {
-      return {
-        link: link,
-        name: link,
-        display: auth.isAuthorized || link !== 'dashboard'
-      }
+    this.topMenuItems = this.topMenuItems.map(item => {
+      item.display = auth.isAuthorized;
+      return item;
     });
   }
 
