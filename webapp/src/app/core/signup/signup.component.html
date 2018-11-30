@@ -1,58 +1,62 @@
-<div class="animated fadeIn">
+<div class="container">
+  <div class="title">
+    <div class="strong-label">Welcome to Investor Onboarding</div>
+    <div class="middle-label">Create an account to complete the investment documents online.</div>
+  </div>
+
   <div class="row">
-    <div class="col-sm-6">
-      <div class="card">
-        <div class="card-header">
-          <strong>Welcome to Investor Onboarding</strong>
-          <small>Create an account to complete the investment documents online.</small>
-        </div>
-        <div class="card-body">
-          <form [formGroup]="signupForm" (ngSubmit)="onSubmit(signupForm)" class="form-horizontal">
-            <mat-form-field>
-              <input matInput maxlength="25" placeholder="First Name" formControlName="firstName" required>
-            </mat-form-field>
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit(signupForm)" class="form-horizontal">
+      <div>
+        <mat-form-field>
+          <input matInput maxlength="25" placeholder="First Name" formControlName="firstName" required>
+        </mat-form-field>
 
-            <mat-form-field>
-              <input matInput maxlength="25" placeholder="Last Name" formControlName="lastName" required>
-            </mat-form-field>
-
-            <mat-form-field class="full-width">
-                <input matInput type="email" placeholder="Email" formControlName="email" required>
-                <mat-error *ngFor="let val of accountValidationMessages.email">
-                  <mat-error class="error-message" *ngIf="signupForm.get('email').hasError(val.type) && (signupForm.get('email').dirty || signupForm.get('email').touched)">{{val.message}}</mat-error>
-                </mat-error>
-              </mat-form-field>
-
-            <div formGroupName="matchingPasswords">
-                <mat-form-field class="full-width">
-                  <input matInput type="password" placeholder="Create password" formControlName="createPassword" required>
-                  <mat-error *ngFor="let val of accountValidationMessages.createPassword">
-                    <mat-error class="error-message" *ngIf="signupForm.get('matchingPasswords').get('createPassword').hasError(val.type) && (signupForm.get('matchingPasswords').get('createPassword').dirty || signupForm.get('matchingPasswords').get('createPassword').touched)">{{val.message}}</mat-error>
-                  </mat-error>
-                </mat-form-field>
-
-                <mat-form-field class="full-width">
-                  <input matInput type="password" placeholder="Confirm password" formControlName="confirmPassword"  [errorStateMatcher]="parentErrorStateMatcher" required>
-                  <mat-error *ngFor="let val of accountValidationMessages.createPassword">
-                      <mat-error class="error-message" *ngIf="signupForm.get('matchingPasswords').get('confirmPassword').hasError(val.type) && (signupForm.get('matchingPasswords').get('confirmPassword').dirty || signupForm.get('matchingPasswords').get('confirmPassword').touched)">{{val.message}}</mat-error>
-                    </mat-error>
-                </mat-form-field>
-            </div>
-
-            <mat-form-field>
-              <input matInput type="text" formControlName="phoneNumber" placeholder="Phone number">
-              <mat-error *ngFor="let val of accountValidationMessages.email">
-                  <mat-error class="error-message" *ngIf="signupForm.get('email').hasError(val.type) && (signupForm.get('email').dirty || signupForm.get('email').touched)">{{val.message}}</mat-error>
-                </mat-error>
-            </mat-form-field>
-
-            <button class="submit-btn" color="primary" mat-raised-button type="submit" [disabled]="!signupForm.valid">
-                Sign up
-            </button>
-          </form>
-        </div>
+        <mat-form-field>
+          <input matInput maxlength="25" placeholder="Last Name" formControlName="lastName" required>
+        </mat-form-field>
       </div>
-    </div>
 
+      <div>
+        <mat-form-field class="full-width">
+          <input matInput type="email" placeholder="Email" formControlName="email" required>
+          <mat-error *ngFor="let val of accountValidationMessages.email">
+            <mat-error class="error-message" *ngIf="signupForm.get('email').hasError(val.type) && (signupForm.get('email').dirty || signupForm.get('email').touched)">{{val.message}}</mat-error>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div formGroupName="matchingPasswords">
+        <mat-form-field class="full-width">
+          <input matInput type="password" placeholder="Create password" formControlName="createPassword" required>
+          <mat-error *ngFor="let val of accountValidationMessages.createPassword">
+            <mat-error class="error-message" *ngIf="signupForm.get('matchingPasswords').get('createPassword').hasError(val.type) && (signupForm.get('matchingPasswords').get('createPassword').dirty || signupForm.get('matchingPasswords').get('createPassword').touched)">{{val.message}}</mat-error>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <input matInput type="password" placeholder="Confirm password" formControlName="confirmPassword"
+            [errorStateMatcher]="parentErrorStateMatcher" required>
+          <mat-error *ngFor="let val of accountValidationMessages.createPassword">
+            <mat-error class="error-message" *ngIf="signupForm.get('matchingPasswords').get('confirmPassword').hasError(val.type) && (signupForm.get('matchingPasswords').get('confirmPassword').dirty || signupForm.get('matchingPasswords').get('confirmPassword').touched)">{{val.message}}</mat-error>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <input matInput type="text" formControlName="phoneNumber" placeholder="Phone number">
+          <mat-error *ngFor="let val of accountValidationMessages.email">
+            <mat-error class="error-message" *ngIf="signupForm.get('email').hasError(val.type) && (signupForm.get('email').dirty || signupForm.get('email').touched)">{{val.message}}</mat-error>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+
+      <div>
+        <button class="submit-btn" color="primary" mat-raised-button type="submit" [disabled]="!signupForm.valid">
+          Sign up
+        </button>
+      </div>
+    </form>
   </div>
 </div>

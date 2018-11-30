@@ -1,31 +1,21 @@
-<div class="animated fadeIn">
+<div class="container">
   <div class="row">
-    <div class="col-sm-6">
-      <div class="card">
-        <div class="card-header">
-          <strong>Investor portfolio</strong>
-        </div>
-        <div class="card-body">
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm)" class="form-horizontal">
-            <div class="row">
-              <div class="form-group col-sm-6">
-                <input type="text" class="form-control" formControlName="email" id="name" placeholder="email">
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="form-group col-sm-6">
-                <input type="password" class="form-control" formControlName="password" id="password" placeholder="">
-              </div>
-            </div>
-
-            <div class="card-footer">
-              <button type="submit" class="btn btn-sm btn-primary"><i class="fa"></i> Login</button>
-            </div>
-          </form>
-        </div>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm)" class="form-horizontal">
+      <div>
+        <mat-form-field class="full-width">
+          <input matInput type="email" placeholder="Email" formControlName="email" required>
+        </mat-form-field>
       </div>
-    </div>
-
+      <div>
+        <mat-form-field class="full-width">
+          <input matInput type="password" placeholder="Password" formControlName="password" required>
+        </mat-form-field>
+      </div>
+      <div>
+        <button class="submit-btn" color="primary" mat-raised-button type="submit">
+          Login
+        </button>
+      </div>
+    </form>
   </div>
 </div>

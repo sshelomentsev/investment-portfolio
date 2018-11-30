@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormBuilder, FormGroup, Validators, NgForm, FormGroupDirective } from '@angular/forms';
 
 import { PasswordValidator } from '../../shared/validators/password.validator';
@@ -7,7 +7,8 @@ import { SignupService } from 'src/app/common/signup.service';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss']
+  styleUrls: ['./signup.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SignupComponent implements OnInit {
 
@@ -48,7 +49,7 @@ export class SignupComponent implements OnInit {
       createPassword: new FormControl('', Validators.compose([
         Validators.minLength(5),
         Validators.required,
-        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9]+$')
+        Validators.pattern('^[a-zA-Z0-9]+$')
       ])),
       confirmPassword: new FormControl('', Validators.required)
     }, (formGroup: FormGroup) => {

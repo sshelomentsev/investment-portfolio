@@ -1,47 +1,18 @@
-app-forms-page {
+app-signup {
   .container {
     margin-top: 50px;
-  }
-// Workaround for https://github.com/angular/material2/issues/4580.
-  mat-form-field .mat-form-field {
-    &-underline {
-      position: relative;
-      bottom: auto;
-    }
-    &-subscript-wrapper {
-      position: static;
-    }
-  }
-
-  .section-title {
-    margin-bottom: 20px;
-  }
-
-  .user-details-container {
-    padding: 20px;
-    text-align: center;
-
-    .user-image {
-      width: 100%;
-      border-radius: 50%;
-    }
-
-    .user-title {
-      font-size: 14px;
-      font-weight: 500;
-      margin-top: 30px;
-      display: block;
-    }
-
-    .user-bio {
-      font-size: 12px;
-      margin-top: 20px;
-      display: block;
-      color: rgba(0, 0, 0, 0.70);
+    .title {
+      margin-bottom: 40px;
+      text-align: center;
+      .strong-label {
+        font-size: 20px;
+        font-weight: 600;
+      }
+      .middle-label {
+        font-size: 14px;
+      }
     }
   }
-
-
 
   .full-width {
     width: 100%;
@@ -63,6 +34,6 @@ app-forms-page {
   }
 
   .submit-btn {
-    margin-top: 30px;
+      margin-top: 30px;
   }
 }

@@ -1,11 +1,39 @@
-.cont {
-  position: absolute;
-  margin: auto;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 800px;
-  height: 400px;
-  border-radius: 3px;
+app-login {
+  .container {
+    margin-top: 50px;
+    .title {
+      margin-bottom: 40px;
+      text-align: center;
+      .strong-label {
+        font-size: 20px;
+        font-weight: 600;
+      }
+      .middle-label {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .error-message {
+    font-size: 12px;
+  }
+
+  .double-line-hint {
+    .mat-input-hint-wrapper {
+      flex-wrap: wrap;
+
+      .hint-line {
+        flex: 0 0 100%;
+      }
+    }
+  }
+
+  .submit-btn {
+      margin-top: 30px;
+  }
 }
