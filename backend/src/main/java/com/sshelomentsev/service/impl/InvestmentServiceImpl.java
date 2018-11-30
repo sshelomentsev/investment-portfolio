@@ -16,7 +16,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.core.Vertx;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +31,8 @@ public class InvestmentServiceImpl implements InvestmentService {
             "            let querySum = `for t in transaction filter t.user == \"${user}\" and t.currency == \"${currency}\" collect aggregate s = sum(t.amount) return s`\n"+
             "            let currAmount = db._query(querySum).toArray()[0]\n"+
             "            if (currAmount >= amount) {\n"+
-            "                db.transaction.save({user: user, operation: 'SELL', timestamp: new Date().getTime(), currency: currency, amount: amount})\n"+
+            "                let amountToSave = -1 * amount;\n"+
+            "                db.transaction.save({user: user, operation: 'SELL', timestamp: new Date().getTime(), currency: currency, amount: amountToSave})\n"+
             "                return {'success': true};\n"+
             "            }\n"+
             "            return {'success': false};\n"+
@@ -114,11 +114,7 @@ public class InvestmentServiceImpl implements InvestmentService {
                             Transaction transaction = event.result().getJsonObject(i).mapTo(Transaction.class);
 
                             Double currentAmount = map.getOrDefault(transaction.getCurrency(), 0.0);
-                            if (Operation.BUY.equals(transaction.getOperation())) {
-                                currentAmount += transaction.getAmount();
-                            } else {
-                                currentAmount -= transaction.getAmount();
-                            }
+                            currentAmount += transaction.getAmount();
                             map.put(transaction.getCurrency(), currentAmount);
                         }
 
@@ -132,7 +128,7 @@ public class InvestmentServiceImpl implements InvestmentService {
                             stakingCoin.setRate(tick.getDouble("rate"));
 
                             final Double current = map.getOrDefault(stakingCoin.getCurrencyCode(), 0.0);
-                            stakingCoin.setAmountFiat(current);
+                            stakingCoin.setAmountCrypto(current);
                             stakingCoin.setAmountFiat(current * stakingCoin.getRate());
 
                             stakingCoin.setHourChange(tick.getDouble("hour"));

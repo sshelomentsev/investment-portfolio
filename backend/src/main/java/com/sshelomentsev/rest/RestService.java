@@ -53,7 +53,7 @@ public class RestService extends AbstractVerticle {
     }
 
     @Override
-    public void start(Future<Void> startFuture) throws Exception {
+    public void start(Future<Void> startFuture) {
         UserAuthProvider authProvider = new UserAuthProvider(vertx, db);
         RxAuthProvider provider = new RxAuthProvider(authProvider);
         AuthHandler authHandler = BasicAuthHandler.create(provider);
@@ -75,8 +75,6 @@ public class RestService extends AbstractVerticle {
 
         router.route("/api/v1/*").handler(authHandler);
 
-        //router.route("/api/users/login").handler(authHandler);
-        //router.route("/api/users/login").handler(authHandler);
         router.post("/api/users/login").handler(createUserAuthHandler(provider));
         router.post("/api/users/logout").handler(ctx -> {
             ctx.clearUser();
@@ -161,9 +159,8 @@ public class RestService extends AbstractVerticle {
             final double amount = ctx.getBodyAsJson().getDouble("amount");
             investmentService.sellCoins(userId, currency, amount, event -> {
                 if (event.succeeded()) {
-                    ctx.response().setStatusCode(200).end(ctx.user().principal().encodePrettily());
+                    ctx.response().setStatusCode(200).end(event.result().encodePrettily());
                 } else {
-                    event.cause().printStackTrace();
                     ctx.response().setStatusCode(400).end();
                 }
             });
@@ -178,9 +175,8 @@ public class RestService extends AbstractVerticle {
             final double amount = ctx.getBodyAsJson().getDouble("amount");
             investmentService.buyCoins(userId, currency, amount, event -> {
                 if (event.succeeded()) {
-                    ctx.response().setStatusCode(200).end(ctx.user().principal().encodePrettily());
+                    ctx.response().setStatusCode(200).end(new JsonObject().put("success", true).encodePrettily());
                 } else {
-                    event.cause().printStackTrace();
                     ctx.response().setStatusCode(400).end();
                 }
             });
@@ -194,7 +190,6 @@ public class RestService extends AbstractVerticle {
                 if (event.succeeded()) {
                     ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
                 } else {
-                    event.cause().printStackTrace();
                     ctx.response().setStatusCode(400).end();
                 }
             });
