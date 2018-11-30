@@ -44,15 +44,15 @@ export class DataService {
     return this.operateCoins(currency, amount, 'sell');
   }
 
-  private operateCoins(currency: string, amount: number, operation: string): Promise<string> {
+  public operateCoins(currency: string, amount: number, operation: string): Promise<any> {
     const url = this.getBaseUrl() + 'coins/' + operation;
     const info = {
       currency: currency,
       amount: amount
     };
-    return new Promise<string>((resolve) => {
+    return new Promise<any>((resolve) => {
       this.post(url, info).subscribe(res => {
-        resolve(res.text());
+        resolve(res.json());
       })
     });
   }

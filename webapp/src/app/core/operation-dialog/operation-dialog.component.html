@@ -2,10 +2,10 @@
 <div mat-dialog-content>
   <p>How much coins do you want to {{data.operation}}</p>
   <mat-form-field>
-    <input matInput [(ngModel)]="amount">
+    <input matInput type="text" placeholder="Enter amount" [(ngModel)]="amount" required>
   </mat-form-field>
 </div>
-<div mat-dialog-actions>
+<div mat-dialog-actions class="actions">
   <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>{{operationName}}</button>
+  <button mat-button (click)="operate()" cdkFocusInitial>{{operationName}}</button>
 </div>

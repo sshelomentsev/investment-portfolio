@@ -16,6 +16,7 @@ import { SharedModule } from '../shared/shared.module';
 import { CurrentStructureComponent } from './current-structure/current-structure.component';
 import { CoinCardComponent } from './coin-card/coin-card.component';
 import { OperationDialogComponent } from './operation-dialog/operation-dialog.component';
+import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
 
 @NgModule({
   imports: [
@@ -40,10 +41,12 @@ import { OperationDialogComponent } from './operation-dialog/operation-dialog.co
     SignupComponent,
     CurrentStructureComponent,
     CoinCardComponent,
-    OperationDialogComponent
+    OperationDialogComponent,
+    NotificationDialogComponent
   ],
   entryComponents: [
-    OperationDialogComponent
+    OperationDialogComponent,
+    NotificationDialogComponent
   ],
   providers: [
   ]

@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material';
 import { DataService } from 'src/app/common/data.service';
 import { StakingCoin } from '../../model/staking-coin.model';
 import { OperationDialogComponent } from '../operation-dialog/operation-dialog.component';
+import { NotificationDialogComponent } from '../notification-dialog/notification-dialog.component';
 
 @Component({
   selector: 'app-current-structure',
@@ -19,10 +20,7 @@ export class CurrentStructureComponent implements OnInit {
   constructor(private dataService: DataService, public dialog: MatDialog) { }
 
   ngOnInit() {
-    this.dataService.getStackingCoins().then(res => {
-      console.log(res);
-      this.data = res.sort((a, b) => b.rate - a.rate);
-    });
+    this.updateData();
   }
 
   getStakingCoins(): StakingCoin[] {
@@ -34,13 +32,10 @@ export class CurrentStructureComponent implements OnInit {
   }
 
   buy(event) {
-    console.log(event);
     this.openDialog(event, 'buy');
   }
 
   sell(event) {
-    console.log('sell');
-    console.log(event);
     this.openDialog(event, 'sell');
   }
 
@@ -51,7 +46,24 @@ export class CurrentStructureComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+      if (result) {
+        this.updateData();
+      } else {
+        this.openNotification('This operation can not be performed');
+      }
+    });
+  }
+
+  private updateData(): void {
+    this.dataService.getStackingCoins().then(res => {
+      this.data = res.sort((a, b) => b.rate - a.rate);
+    });
+  }
+
+  private openNotification(status: string) {
+    this.dialog.open(NotificationDialogComponent, {
+      width: '400px',
+      data: {status: status}
     });
   }
 
