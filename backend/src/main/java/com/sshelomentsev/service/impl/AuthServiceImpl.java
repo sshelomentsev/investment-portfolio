@@ -3,26 +3,24 @@ package com.sshelomentsev.service.impl;
 import com.arangodb.util.MapBuilder;
 import com.sshelomentsev.arangodb.Database;
 import com.sshelomentsev.model.UserProfile;
-import com.sshelomentsev.service.AuthService;
-import com.sshelomentsev.service.Utils;
+import com.sshelomentsev.service.AsyncResultFailure;
+import com.sshelomentsev.service.UserService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.Vertx;
 import org.mindrot.jbcrypt.BCrypt;
 
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements UserService {
 
-    private final Vertx vertx;
     private final Database db;
 
-    public AuthServiceImpl(Vertx vertx, Database db) {
-        this.vertx = vertx;
+    public AuthServiceImpl(Database db) {
         this.db = db;
     }
 
     @Override
-    public AuthService createUser(UserProfile userProfile, Handler<AsyncResult<JsonObject>> resultHandler) {
+    public UserService createUser(UserProfile userProfile, Handler<AsyncResult<JsonObject>> resultHandler) {
         db.query("for u in user filter user.email == @email return u",
                 new MapBuilder().put("email", userProfile.getEmail()).get(), event -> {
             if (event.succeeded()) {
@@ -31,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
                     userProfile.setPassword(hashed);
                     db.collection("user").insert(JsonObject.mapFrom(userProfile), resultHandler);
                 } else {
-                    resultHandler.handle(Utils.createFailureResult2("User already exist"));
+                    resultHandler.handle(new AsyncResultFailure("User with specified email is already exist"));
                 }
             } else {
                 event.cause().printStackTrace();

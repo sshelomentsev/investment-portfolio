@@ -4,7 +4,7 @@ import com.sshelomentsev.arangodb.Database;
 import com.sshelomentsev.auth.RxAuthProvider;
 import com.sshelomentsev.auth.UserAuthProvider;
 import com.sshelomentsev.model.UserProfile;
-import com.sshelomentsev.service.AuthService;
+import com.sshelomentsev.service.UserService;
 import com.sshelomentsev.service.InvestmentService;
 import com.sshelomentsev.service.StatisticsService;
 import com.sshelomentsev.util.Runner;
@@ -41,16 +41,15 @@ public class RestService extends AbstractVerticle {
 
     private InvestmentService investmentService;
     private StatisticsService statisticsService;
-    private AuthService authService;
+    private UserService authService;
     private WebClient client;
     private Database db;
 
-    public RestService(InvestmentService investmentService, StatisticsService statisticsService, AuthService authService, Database db) {
+    public RestService(InvestmentService investmentService, StatisticsService statisticsService, UserService authService, Database db) {
         this.investmentService = investmentService;
         this.statisticsService = statisticsService;
         this.authService = authService;
         this.db = db;
-        this.client = WebClient.create(vertx);
     }
 
     @Override
@@ -60,6 +59,7 @@ public class RestService extends AbstractVerticle {
         AuthHandler authHandler = BasicAuthHandler.create(provider);
         authHandler.addAuthority("whatever");
 
+        client = WebClient.create(vertx);
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
         router.route().produces("application/json");
@@ -73,11 +73,12 @@ public class RestService extends AbstractVerticle {
 
         router.route().handler(UserSessionHandler.create(provider));
 
-        //router.route("/api/v1/*").handler(authHandler);
+        router.route("/api/v1/*").handler(authHandler);
 
-        router.route("/api/users/login/").handler(authHandler);
-        router.get("/api/users/login").handler(createUserAuthHandler());
-        router.get("/api/users/logout").handler(ctx -> {
+        //router.route("/api/users/login").handler(authHandler);
+        //router.route("/api/users/login").handler(authHandler);
+        router.post("/api/users/login").handler(createUserAuthHandler(provider));
+        router.post("/api/users/logout").handler(ctx -> {
             ctx.clearUser();
             ctx.response().setStatusCode(302).end();
         });
@@ -111,6 +112,7 @@ public class RestService extends AbstractVerticle {
                     }
                 });
             } catch (IllegalArgumentException e) {
+                //e.printStackTrace();
                 ctx.response().setStatusCode(400).end();
             }
         };
@@ -118,7 +120,7 @@ public class RestService extends AbstractVerticle {
 
     private Handler<RoutingContext> createInvestmentPortfolioHandler() {
         return ctx -> {
-            investmentService.getInvestmentPortfolio(getUserId(ctx), event -> {
+            investmentService.getStackingCoins(getUserId(ctx), event -> {
                 if (event.succeeded()) {
                     ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
                 }
@@ -139,9 +141,16 @@ public class RestService extends AbstractVerticle {
         };
     }
 
-    private Handler<RoutingContext> createUserAuthHandler() {
+    private Handler<RoutingContext> createUserAuthHandler(RxAuthProvider provider) {
         return ctx -> {
-            ctx.response().end();
+            provider.authenticate(ctx.getBodyAsJson(), res -> {
+                if (res.succeeded()) {
+                    ctx.response().putHeader("Content-type", "application/json")
+                            .end(res.result().principal().encodePrettily());
+                } else {
+                    ctx.response().setStatusCode(401).end();
+                }
+            });
         };
     }
 
@@ -163,6 +172,7 @@ public class RestService extends AbstractVerticle {
 
     private Handler<RoutingContext> createBuyCoinsHandler() {
         return ctx -> {
+            System.out.println(ctx.getBodyAsJson().encodePrettily());
             final String userId = ctx.user().principal().getString("_id");
             final String currency = ctx.getBodyAsJson().getString("currency");
             final double amount = ctx.getBodyAsJson().getDouble("amount");
@@ -181,21 +191,6 @@ public class RestService extends AbstractVerticle {
     private Handler<RoutingContext> createSnapshotsHandler() {
         return ctx -> {
             statisticsService.getSnapshots(ctx.request().getParam("period"), event -> {
-                if (event.succeeded()) {
-                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
-                } else {
-                    event.cause().printStackTrace();
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
-        };
-    }
-
-    private Handler<RoutingContext> createSnapshotsHandler2() {
-        return ctx -> {
-            final String period = ctx.request().getParam("period");
-            final String currency = ctx.request().getParam("currency");
-            statisticsService.getSnapshots(currency, period, event -> {
                 if (event.succeeded()) {
                     ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
                 } else {

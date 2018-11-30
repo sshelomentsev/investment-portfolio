@@ -1,8 +1,9 @@
 package com.sshelomentsev.service.impl;
 
 import com.sshelomentsev.arangodb.Database;
+import com.sshelomentsev.service.AsyncResultFailure;
+import com.sshelomentsev.service.AsyncResultSuccess;
 import com.sshelomentsev.service.StatisticsService;
-import com.sshelomentsev.service.Utils;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -17,28 +18,24 @@ import java.util.stream.Collectors;
 
 public class StatisticsServiceImpl implements StatisticsService {
 
-    private final Vertx vertx;
     private final Database db;
     private final WebClient client;
 
     private List<String> currencies = new ArrayList<>();
 
     public StatisticsServiceImpl(Vertx vertx, Database db) {
-        this.vertx = vertx;
         this.db = db;
         client = WebClient.create(vertx);
     }
 
     @Override
     public StatisticsService initialize(Handler<AsyncResult<Void>> resultHandler) {
-        db.query("for c in cryptoCurrency return {code: c.code}", event -> {
+        db.query("for c in currency return {code: c.code}", event -> {
             if (event.succeeded()) {
                 currencies = event.result()
                         .stream().map(s -> ((JsonObject) s).getString("code"))
                         .collect(Collectors.toList());
                 resultHandler.handle(null);
-            } else {
-                event.cause().printStackTrace();
             }
         });
         return this;
@@ -46,15 +43,6 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public StatisticsService getSnapshots(String period, Handler<AsyncResult<JsonArray>> resultHandler) {
-        getSnapshotsForCurrencies(currencies, period, resultHandler);
-
-        return this;
-    }
-
-    @Override
-    public StatisticsService getSnapshots(String currency, String period, Handler<AsyncResult<JsonArray>> resultHandler) {
-        List<String> currencies = new ArrayList<>(1);
-        currencies.add(currency);
         getSnapshotsForCurrencies(currencies, period, resultHandler);
 
         return this;
@@ -75,7 +63,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 ret.add(json);
             }
             return ret;
-        }).subscribe(s -> resultHandler.handle(Utils.createAsyncResult(s)));
+        }).subscribe(s -> resultHandler.handle(new AsyncResultSuccess<JsonArray>(s)));
 
         return this;
     }
@@ -96,9 +84,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                     ret.add(json);
                 }
                 return ret;
-            }).subscribe(res -> resultHandler.handle(Utils.createAsyncResult(res)));
+            }).subscribe(res -> resultHandler.handle(new AsyncResultSuccess<JsonArray>(res)));
         } else {
-            resultHandler.handle(Utils.createFailureResult("Incorrect period"));
+            resultHandler.handle(new AsyncResultFailure("Incorrect period"));
         }
     }
 

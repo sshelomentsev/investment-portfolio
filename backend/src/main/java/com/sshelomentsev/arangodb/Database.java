@@ -2,6 +2,7 @@ package com.sshelomentsev.arangodb;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDatabase;
+import com.arangodb.model.TransactionOptions;
 import com.arangodb.util.MapBuilder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -12,6 +13,9 @@ import io.vertx.core.json.JsonObject;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * ArangoDatabase wrapper that provides a way to make queries in asynchronous manner
+ */
 public class Database {
 
     private Vertx vertx;
@@ -52,6 +56,12 @@ public class Database {
 
     public Database query(String query, Handler<AsyncResult<JsonArray>> handler) {
         return query(query, new MapBuilder().get(), handler);
+    }
+
+    public Database transaction(String action, TransactionOptions options, Handler<AsyncResult<JsonObject>> handler) {
+        vertx.executeBlocking(future -> future.complete(
+                new JsonObject(database.transaction(action, String.class, options))), handler);
+        return this;
     }
 
 }

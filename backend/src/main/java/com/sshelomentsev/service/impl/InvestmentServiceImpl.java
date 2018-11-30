@@ -1,47 +1,65 @@
 package com.sshelomentsev.service.impl;
 
+import com.arangodb.model.TransactionOptions;
 import com.arangodb.util.MapBuilder;
+import com.arangodb.velocypack.VPackBuilder;
+import com.arangodb.velocypack.ValueType;
 import com.sshelomentsev.arangodb.Database;
 import com.sshelomentsev.model.Operation;
+import com.sshelomentsev.model.StakingCoin;
 import com.sshelomentsev.model.Transaction;
+import com.sshelomentsev.service.AsyncResultFailure;
+import com.sshelomentsev.service.AsyncResultSuccess;
 import com.sshelomentsev.service.InvestmentService;
 import com.sshelomentsev.service.StatisticsService;
-import com.sshelomentsev.service.Utils;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.Vertx;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 public class InvestmentServiceImpl implements InvestmentService {
 
+    private static final String SELL_AQL_ACTION = "function(params) {\n"+
+            "            const db = require(\"@arangodb\").db;\n" +
+            "            const user = params['user'];" +
+            "            const currency = params['currency'];\n" +
+            "            const amount = params['amount'];\n" +
+            "            let querySum = `for t in transaction filter t.user == \"${user}\" and t.currency == \"${currency}\" collect aggregate s = sum(t.amount) return s`\n"+
+            "            let currAmount = db._query(querySum).toArray()[0]\n"+
+            "            if (currAmount >= amount) {\n"+
+            "                db.transaction.save({user: user, operation: 'SELL', timestamp: new Date().getTime(), currency: currency, amount: amount})\n"+
+            "                return {'success': true};\n"+
+            "            }\n"+
+            "            return {'success': false};\n"+
+            "        }";
+
     private static final String TRANSACTION_COLLECTION_NAME = "transaction";
 
-    private final Vertx vertx;
     private final Database db;
     private final StatisticsService statisticsService;
 
-    private List<String> currencies = new ArrayList<>();
+    private Map<String, String> currencies;
 
-    public InvestmentServiceImpl(Vertx vertx, Database db, StatisticsService statisticsService) {
-        this.vertx = vertx;
+    public InvestmentServiceImpl(Database db, StatisticsService statisticsService) {
         this.db = db;
         this.statisticsService = statisticsService;
     }
 
     @Override
     public InvestmentService initialize(Handler<AsyncResult<Void>> resultHandler) {
-        db.query("for c in cryptoCurrency return {code: c.code}", event -> {
+        db.query("for c in currency return c", event -> {
             if (event.succeeded()) {
-                currencies = event.result()
-                        .stream().map(s -> ((JsonObject) s).getString("code"))
-                        .collect(Collectors.toList());
+                currencies = new HashMap<>();
+                for (int i = 0; i < event.result().size(); i++) {
+                    JsonObject currency = event.result().getJsonObject(i);
+                    currencies.put(currency.getString("code"), currency.getString("name"));
+                }
+
                 resultHandler.handle(null);
             }
         });
@@ -51,23 +69,31 @@ public class InvestmentServiceImpl implements InvestmentService {
     @Override
     public InvestmentService buyCoins(String buyer, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler) {
         final Transaction transaction = new Transaction(buyer, currency, amount, Operation.BUY);
-        processTransaction(transaction, resultHandler);
+        if (currencies.containsKey(transaction.getCurrency())) {
+            db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
+        } else {
+            resultHandler.handle(new AsyncResultFailure("Specified currency does not exist or is not served"));
+        }
         return this;
     }
 
     @Override
     public InvestmentService sellCoins(String seller, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler) {
-        final Transaction transaction = new Transaction(seller, currency, amount, Operation.SELL);
-        processTransaction(transaction, resultHandler);
-        return this;
-    }
+        final TransactionOptions options = new TransactionOptions().writeCollections(TRANSACTION_COLLECTION_NAME)
+                .params(new VPackBuilder().add(ValueType.OBJECT)
+                        .add("currency", currency)
+                        .add("user",seller)
+                        .add("amount", amount)
+                        .close().slice());
 
-    private void processTransaction(Transaction transaction, Handler<AsyncResult<JsonObject>> resultHandler) {
-        if (currencies.contains(transaction.getCurrency())) {
-            db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
-        } else {
-            resultHandler.handle(Utils.createFailureResult2("Specified currency does not exist"));
-        }
+        db.transaction(SELL_AQL_ACTION, options, event -> {
+            if (event.succeeded()) {
+                resultHandler.handle(new AsyncResultSuccess<JsonObject>(event.result()));
+            } else {
+                resultHandler.handle(new AsyncResultFailure(event.cause().getMessage()));
+            }
+        });
+        return this;
     }
 
     @Override
@@ -78,7 +104,7 @@ public class InvestmentServiceImpl implements InvestmentService {
     }
 
     @Override
-    public InvestmentService getInvestmentPortfolio(String user, Handler<AsyncResult<JsonArray>> resultHandler) {
+    public InvestmentService getStackingCoins(String user, Handler<AsyncResult<JsonArray>> resultHandler) {
         statisticsService.getTicks(res -> {
             if (res.succeeded()) {
                 db.query("for t in transaction filter t.user == @user return t", new MapBuilder().put("user", user).get(), event -> {
@@ -96,26 +122,27 @@ public class InvestmentServiceImpl implements InvestmentService {
                             map.put(transaction.getCurrency(), currentAmount);
                         }
 
-                        JsonArray ret = new JsonArray();
+                        JsonArray stackingCoins = new JsonArray();
                         for (int i = 0; i < res.result().size(); i++) {
                             final JsonObject tick = res.result().getJsonObject(i);
-                            System.out.println(tick.encodePrettily());
-                            final String currency = tick.getString("currency");
-                            final Double rate = tick.getDouble("rate");
-                            System.out.println(currency + " -> " + rate);
 
-                            final Double current = map.getOrDefault(currency, 0.0);
-                            if (current > 0) {
-                                JsonObject rs = new JsonObject();
-                                rs.put("currency", currency);
-                                rs.put("rate", rate);
-                                rs.put("amountNative", current);
-                                rs.put("amountUsd", current * rate);
-                                ret.add(rs);
-                            }
+                            StakingCoin stakingCoin = new StakingCoin();
+                            stakingCoin.setCurrencyCode(tick.getString("currency"));
+                            stakingCoin.setCurrencyName(stakingCoin.getCurrencyCode());
+                            stakingCoin.setRate(tick.getDouble("rate"));
+
+                            final Double current = map.getOrDefault(stakingCoin.getCurrencyCode(), 0.0);
+                            stakingCoin.setAmountFiat(current);
+                            stakingCoin.setAmountFiat(current * stakingCoin.getRate());
+
+                            stakingCoin.setHourChange(tick.getDouble("hour"));
+                            stakingCoin.setDayChange(tick.getDouble("day"));
+                            stakingCoin.setWeekChange(tick.getDouble("week"));
+
+                            stackingCoins.add(JsonObject.mapFrom(stakingCoin));
                         }
 
-                        resultHandler.handle(Utils.createAsyncResult(ret));
+                        resultHandler.handle(new AsyncResultSuccess<JsonArray>(stackingCoins));
                     }
                 });
             }
@@ -123,8 +150,6 @@ public class InvestmentServiceImpl implements InvestmentService {
 
         return this;
     }
-
-
 
 
 }

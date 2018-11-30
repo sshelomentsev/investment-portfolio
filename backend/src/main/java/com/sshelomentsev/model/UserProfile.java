@@ -6,7 +6,7 @@ public class UserProfile {
     private transient String password;
     private String firstName;
     private String lastName;
-    private String phone;
+    private String phoneNumber;
 
     public UserProfile() {
 
@@ -44,11 +44,11 @@ public class UserProfile {
         this.lastName = lastName;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

@@ -25,7 +25,9 @@ public class UserAuthProvider implements AuthProvider {
     @Override
     public void authenticate(JsonObject authInfo, Handler<AsyncResult<io.vertx.ext.auth.User>> handler) {
         vertx.executeBlocking(future -> {
-            final String query = "for u in user filter u.email == @email return u";
+            final String query = "for u in user filter u.email == @email return " +
+                    "{_id: u._id, email: u.email, password: u.password, " +
+                    "firstName: u.firstName, secondName: u.secondName, phoneNumber: u.phoneNumber}";
             Map<String, Object> bindVars = new MapBuilder()
                     .put("email", authInfo.getString("username"))
                     .get();
@@ -34,6 +36,8 @@ public class UserAuthProvider implements AuthProvider {
                     String hash = event.result().getJsonObject(0).getString("password");
                     if (BCrypt.checkpw((authInfo.getString("password")), hash)) {
                         System.out.println(event.result().getJsonObject(0).encodePrettily());
+                        JsonObject ret = event.result().getJsonObject(0);
+                        ret.remove("password");
                         future.complete(event.result().getJsonObject(0));
                     } else {
                         future.fail("{'res': 'user in not correct}");

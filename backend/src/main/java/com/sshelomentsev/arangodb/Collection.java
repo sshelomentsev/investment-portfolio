@@ -9,6 +9,9 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 
+/**
+ * ArangoCollection wrapper that provides a way to make queries in asynchronous manner
+ */
 public class Collection {
 
     private Vertx vertx;
