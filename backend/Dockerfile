@@ -19,4 +19,8 @@ COPY conf/config.json $VERTICLE_HOME/
 # Launch the verticle
 WORKDIR $VERTICLE_HOME
 ENTRYPOINT ["sh", "-c"]
-CMD ["exec java -jar $VERTICLE_FILE"]
+
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
+RUN chmod +x /wait
+
+CMD ["/wait && exec java -jar $VERTICLE_FILE"]
