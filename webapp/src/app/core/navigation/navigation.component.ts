@@ -35,7 +35,6 @@ export class NavigationComponent implements OnInit {
 
   public logout(): void {
     this.auth.logout();
-    this.router.navigate(['/players']);
   }
 
   public isAuthorized(): boolean {

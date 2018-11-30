@@ -1,33 +1,51 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Http } from '@angular/http';
 import { map } from 'rxjs/operators';
+
+import { environment } from '../../../environments/environment';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthService {
 
-  constructor(private http: HttpClient) {
+  private readonly authStorageKey = 'currentUser';
+
+  private authorized = false;
+
+  constructor(private http: Http, private router: Router) {
 
   }
 
-  login(username: string, password: string) {
-    return this.http.post('http://localhost:8888/api/v1/users/auth', { username, password })
-      .pipe(map(user => {
-        if (user) {
-          console.log(user);
-          //user.authdata = window.btoa(username + ':' + password);
-          localStorage.setItem('currentUser', JSON.stringify(user));
-        }
+  public login(username: string, password: string) {
+    console.log('login');
+    const url = 'http://localhost:8888/api/users/login';
+    const body = {
+      username: username,
+      password: password
+    };
+    this.http.post(url, body).subscribe(user => {
+      if (user) {
+        console.log(user);
+        localStorage.setItem(this.authStorageKey, btoa(username + ":" + password));
+        this.router.navigate(['/dashboard']);
+      }
 
-        return user;
-      }));
+      return user;
+    });
   }
 
-  logout() {
-    localStorage.removeItem('currentUser');
+  public logout() {
+    localStorage.removeItem(this.authStorageKey);
+    this.router.navigate(['/login']);
   }
 
-  isAuthorized() {
-    return true;
+  public getAuth(): string {
+    console.log(localStorage.getItem(this.authStorageKey));
+    return 'Basic ' + localStorage.getItem(this.authStorageKey);
+  }
+
+  public isAuthorized() {
+    return null !== localStorage.getItem(this.authStorageKey) && undefined !== localStorage.getItem(this.authStorageKey);
   }
 
 }

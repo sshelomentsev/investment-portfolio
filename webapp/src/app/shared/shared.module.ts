@@ -1,6 +1,8 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { MaterialModule } from './material.module';
+import { MaterialModule } from './modules/material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
+
+import { PasswordValidator } from './validators/password.validator';
 
 @NgModule({
   imports: [

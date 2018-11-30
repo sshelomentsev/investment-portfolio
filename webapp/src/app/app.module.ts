@@ -13,9 +13,10 @@ import { HttpModule } from '@angular/http';
 
 import { CoreModule } from './core/core.module';
 import { FundPerformanceComponent } from './fund-performance/fund-performance.component';
-import { SharedModule } from './shared/modules/shared.module';
+import { SharedModule } from './shared/shared.module';
 import { CanActivateAuthGuard } from './can-activate.authguard';
 import { DataService } from './common/data.service';
+import { SignupService } from './common/signup.service';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { DataService } from './common/data.service';
   providers: [
     AuthService,
     CanActivateAuthGuard,
-    DataService
+    DataService,
+    SignupService
   ],
   bootstrap: [AppComponent]
 })

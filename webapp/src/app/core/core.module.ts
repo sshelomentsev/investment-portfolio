@@ -13,7 +13,7 @@ import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { MaterialModule } from '../shared/modules/material.module';
 import { CurrencyCardComponent } from './currency-card/currency-card.component';
-import { SharedModule } from '../shared/modules/shared.module';
+import { SharedModule } from '../shared/shared.module';
 import { CurrentStructureComponent } from './current-structure/current-structure.component';
 
 @NgModule({
@@ -29,7 +29,8 @@ import { CurrentStructureComponent } from './current-structure/current-structure
     NavigationComponent,
     FooterComponent,
     PageNotFoundComponent,
-    CurrencyCardComponent
+    CurrencyCardComponent,
+    CurrentStructureComponent
   ],
   declarations: [
     NavigationComponent,

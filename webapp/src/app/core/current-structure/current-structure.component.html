@@ -1,3 +1,30 @@
-<p>
-  current-structure works!
-</p>
+<h2 class="section-title">Staking coins</h2>
+
+<mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+  <!-- Position Column -->
+  <ng-container matColumnDef="coin">
+    <mat-header-cell *matHeaderCellDef> Coin </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="amount">
+    <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.amountCrypto}} {{element.code}}</mat-cell>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="usd">
+    <mat-header-cell *matHeaderCellDef> USD </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.amountFiat}} </mat-cell>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="percent">
+    <mat-header-cell *matHeaderCellDef> % </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.percent}} </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row class="example-element-row" *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>
