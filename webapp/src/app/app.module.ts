@@ -18,6 +18,8 @@ import { CanActivateAuthGuard } from './can-activate.authguard';
 import { DataService } from './common/data.service';
 import { SignupService } from './common/signup.service';
 
+import { RouteReuseStrategy } from '@angular/router';
+import { AppRouteReuseStrategy } from './app-route-reuse-strategy';
 
 @NgModule({
   declarations: [
@@ -38,7 +40,11 @@ import { SignupService } from './common/signup.service';
     AuthService,
     CanActivateAuthGuard,
     DataService,
-    SignupService
+    SignupService,
+    {
+      provide: RouteReuseStrategy,
+      useClass: AppRouteReuseStrategy
+    }
   ],
   bootstrap: [AppComponent]
 })
