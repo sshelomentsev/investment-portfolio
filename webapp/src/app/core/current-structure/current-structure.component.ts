@@ -68,6 +68,7 @@ export class CurrentStructureComponent implements OnInit {
     this.dataService.getStackingCoins().then(res => {
       this.dataService.getSnapshots('day').then(snapshots => {
         this.data = res.sort((a, b) => b.rate - a.rate);
+        console.log(this.data);
         snapshots.forEach(s => {
           this.points.set(s.currency, s.values.map(v => v[1]));
         });

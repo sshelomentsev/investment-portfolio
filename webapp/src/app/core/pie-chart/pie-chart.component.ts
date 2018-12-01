@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, ElementRef, SimpleChanges, OnChanges  } from '@angular/core';
 
 import { Chart } from "chart.js";
 import { StakingCoin } from 'src/app/model/staking-coin.model';
@@ -11,24 +11,45 @@ import { DataService } from 'src/app/common/data.service';
   templateUrl: './pie-chart.component.html',
   styleUrls: ['./pie-chart.component.scss']
 })
-export class PieChartComponent implements OnInit, AfterViewInit {
+export class PieChartComponent implements OnInit, AfterViewInit, OnChanges {
 
   private readonly borderWidth: number = 4;
   private readonly canvasHeight: number = 400;
   private readonly canvasWidth: number = 400;
 
-  private data: StakingCoin[] = [];
-
   private chart: any = undefined;
   public hasData: boolean = true;
+
+  @Input()
+  coins: StakingCoin[] = [];
 
   constructor(private el: ElementRef, private dataService: DataService) { }
 
   ngOnInit() {
+    this.updateChart(this.coins);
   }
 
   ngAfterViewInit() {
-    this.updateChart();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['coins']) {
+      const ch = changes['coins'];
+      if (!this.isEqual(ch.previousValue, ch.currentValue)) {
+        this.updateChart(ch.currentValue);
+      }
+    }
+  }
+
+  private isEqual(arr1: StakingCoin[], arr2: StakingCoin[]) {
+    if (!arr1 || !arr2) {
+      return false;
+    }
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    return arr1.filter((v, i) => v.amountCrypto === arr2[i].amountCrypto
+      && v.amountFiat === arr2[i].amountFiat).length == arr1.length;
   }
 
   private createAndRenderChart(config: any): void {
@@ -41,23 +62,21 @@ export class PieChartComponent implements OnInit, AfterViewInit {
     this.chart.render();
   }
 
-  private updateChart(): void {
-    this.dataService.getStackingCoins().then(data => {
-      this.data = data;
-      if (undefined == this.chart) {
-        this.createChartConfig(data).then(config => {
-          this.createAndRenderChart(config);
-        });
-      } else {
-        const dataset = this.chart.data.datasets[0];
-        dataset.data = data.map(item => item.amountCrypto);
+  private updateChart(data: StakingCoin[]): void {
+    if (undefined == this.chart) {
+      this.createChartConfig(data).then(config => {
+        this.createAndRenderChart(config);
+      });
+    } else {
+      const dataset = this.chart.data.datasets[0];
+      dataset.data = data.map(item => item.amountFiat);
 
-        this.chart.data.labels = data.map(item => item.currencyCode);
+      this.chart.data.labels = data.map(item => item.currencyCode);
+      this.chart.data.datasets[0].backgroundColor = data.map(item => ChartColorUtil.getColorCode(item.currencyCode));
 
-        this.chart.update();
-        this.chart.render();
-      }
-    });
+      this.chart.update();
+      this.chart.render();
+    }
   }
 
   private createChartConfig(data: StakingCoin[]): Promise<any> {
@@ -96,11 +115,11 @@ export class PieChartComponent implements OnInit, AfterViewInit {
     if (chartSegments.length > 0) {
       const chart = chartSegments[0]._chart;
       const index = chartSegments[0]._index;
-      const data = this.data[index];
+      const data = this.coins[index];
 
       const title = data.currencyName + ' (' + data.currencyCode + ')';
-      const rate = '$' + this.data[index].rate.toFixed(2);
-      const marketCap = '$' + this.data[index].marketCap;
+      const rate = '$' + this.coins[index].rate.toFixed(2);
+      const marketCap = '$' + this.coins[index].marketCap;
 
       const ctx = chart.ctx;
 
@@ -125,7 +144,10 @@ export class PieChartComponent implements OnInit, AfterViewInit {
     const data = {
       datasets: [{
         data: sourceData.map(item => item.amountFiat),
-        backgroundColor: sourceData.map((item, i) => ChartColorUtil.getColorCode(item.currencyCode)),
+        backgroundColor: sourceData.map(item => {
+          const code = ChartColorUtil.getColorCode(item.currencyCode);
+          return code;
+        }),
         borderColor: new Array(sourceData.length).fill('#808080'),
         borderWidth: new Array(sourceData.length).fill(0),
         hoverBorderColor: new Array(sourceData.length).fill('#005064'),

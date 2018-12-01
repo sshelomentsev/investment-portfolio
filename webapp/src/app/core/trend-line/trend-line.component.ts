@@ -19,7 +19,7 @@ export class TrendLineComponent implements OnInit, OnChanges {
   }
 
   @Input()
-  points: number[] = [2,3,4,19,29];
+  points: number[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['points']) {
@@ -35,7 +35,7 @@ export class TrendLineComponent implements OnInit, OnChanges {
       return false;
     }
     if (arr1.length !== arr2.length) {
-      false;
+      return false;
     }
 
     return arr1.filter((v, i) => v === arr2[i]).length == arr1.length;
