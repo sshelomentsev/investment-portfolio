@@ -1,18 +1,18 @@
 :host(coin-card) {
 
   mat-card {
-    width: 500px;
-    mat-card-header {
-
+    width: 568px;
+    mat-card-content {
+      display: flex;
     }
   }
 
   .coin-card {
-    margin: 4px;
+    margin: 8px 4px;
   }
 
   .currency-title {
-    width: 60px;
+    width: 140px;
     margin-left: -28px;
   }
 
@@ -42,22 +42,36 @@
   }
 
   .staking-amount {
-    padding-left: 40px;
     width: 200px;
+    text-align: center;
+    margin-right: 40px;
   }
 
   .change-by-period {
     height: 100%;
-    width: 156px;
-    padding: 2px 16px;
+    width: 180px;
+    padding: 2px 0;
     flex-grow: 0;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
     font-family: 'Lato', serif;
     font-size: 11px;
     color: gray;
   }
 
-  .change {
+  .change-by-period-start {
+    align-items: flex-start;
+  }
+
+  .change-by-period-center {
+    align-items: center;
+  }
+
+  .change-by-period-end {
+    align-items: flex-end;
+  }
+
+  .change-number {
     font-size: 18px;
   }
 

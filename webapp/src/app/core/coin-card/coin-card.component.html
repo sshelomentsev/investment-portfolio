@@ -17,21 +17,21 @@
     </mat-card-header>
 
     <mat-card-content>
-      <div class="change-by-period">
-        <div>1 hour change</div>
-        <div class="change {{coin.hourChange > 0 ? 'gain' : 'loose'}}">{{coin.hourChange | number: '1.0-2' |
+      <div class="change-by-period change-by-period-start">
+        <div class="change-label">1 hour change</div>
+        <div class="change-number {{coin.hourChange > 0 ? 'gain' : 'loose'}}">{{coin.hourChange | number: '1.0-2' |
           periodChange}}</div>
       </div>
 
-      <div class="change-by-period">
-        <div>24 hour change</div>
-        <div class="change {{coin.dayChange > 0 ? 'gain' : 'loose'}}">{{coin.dayChange | number: '1.0-2' |
+      <div class="change-by-period change-by-period-center">
+        <div class="change-label">24 hour change</div>
+        <div class="change-number {{coin.dayChange > 0 ? 'gain' : 'loose'}}">{{coin.dayChange | number: '1.0-2' |
           periodChange}}</div>
       </div>
 
-      <div class="change-by-period">
-        <div>1 week change</div>
-        <div class="change {{coin.weekChange > 0 ? 'gain' : 'loose'}}">{{coin.weekChange | number: '1.0-2' |
+      <div class="change-by-period change-by-period-end">
+        <div class="change-label">1 week change</div>
+        <div class="change-number {{coin.weekChange > 0 ? 'gain' : 'loose'}}">{{coin.weekChange | number: '1.0-2' |
           periodChange}}</div>
       </div>
     </mat-card-content>
