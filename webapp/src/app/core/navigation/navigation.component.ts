@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { MatSnackBar } from '@angular/material';
 import { AuthService } from '../../common/auth/auth.service';
 import { Router } from '@angular/router';
 
@@ -14,10 +13,6 @@ export class NavigationComponent implements OnInit {
   public topMenuItems: any[] = [{
     link: 'performance',
     name: 'Fund performance'
-  },
-  {
-    link: 'transactions',
-    name: 'Transactions'
   },
   {
     link: 'profile',

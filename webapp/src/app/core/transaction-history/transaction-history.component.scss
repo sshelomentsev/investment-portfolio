@@ -1,7 +1,20 @@
 table {
-  width: 700px;
+  width: 1000px;
 }
 
 td, th {
-  width: 25%;
+  width: 20%;
 }
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.section-title {
+  width: 100%;
+  margin: 16px 20px;
+  text-align: left;
+}
+

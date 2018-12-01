@@ -13,7 +13,6 @@ export class AuthService {
   private readonly authStorageKey = 'currentUser';
 
   private user: User;
-  private authorized = false;
 
   constructor(private http: Http, private router: Router) {
     this.getUserInfo();
@@ -41,6 +40,7 @@ export class AuthService {
 
   public logout() {
     localStorage.removeItem(this.authStorageKey);
+    this.user = undefined;
     this.router.navigate(['/login']);
   }
 

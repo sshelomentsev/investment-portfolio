@@ -40,11 +40,7 @@ import { AppRouteReuseStrategy } from './app-route-reuse-strategy';
     AuthService,
     CanActivateAuthGuard,
     DataService,
-    SignupService,
-    {
-      provide: RouteReuseStrategy,
-      useClass: AppRouteReuseStrategy
-    }
+    SignupService
   ],
   bootstrap: [AppComponent]
 })

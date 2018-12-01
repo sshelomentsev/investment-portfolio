@@ -27,7 +27,7 @@ export class CurrentStructureComponent implements OnInit {
   }
 
   getStakingCoins(): StakingCoin[] {
-    return this.data.filter(coin => coin.amountCrypto > 0);;
+    return this.data;
   }
 
   getCurrentStructure(flag: number): StakingCoin[] {

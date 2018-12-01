@@ -25,6 +25,7 @@ import { TransactionHistoryComponent } from './transaction-history/transaction-h
 import { PieChartComponent } from './pie-chart/pie-chart.component';
 import { TrendLineComponent } from './trend-line/trend-line.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 
 @NgModule({
   imports: [
@@ -58,7 +59,8 @@ import { LineChartComponent } from './line-chart/line-chart.component';
     TransactionHistoryComponent,
     PieChartComponent,
     TrendLineComponent,
-    LineChartComponent
+    LineChartComponent,
+    UserProfileComponent
   ],
   entryComponents: [
     OperationDialogComponent,
