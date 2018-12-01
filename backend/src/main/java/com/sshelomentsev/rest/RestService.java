@@ -8,7 +8,7 @@ import com.sshelomentsev.service.UserService;
 import com.sshelomentsev.service.InvestmentService;
 import com.sshelomentsev.service.StatisticsService;
 import com.sshelomentsev.util.Runner;
-import io.reactivex.Observable;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -27,13 +27,7 @@ import io.vertx.reactivex.ext.web.handler.UserSessionHandler;
 import io.vertx.reactivex.ext.web.sstore.LocalSessionStore;
 import io.vertx.reactivex.ext.web.sstore.SessionStore;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class RestService extends AbstractVerticle {
-
-    private static final String[] currencies = new String[]{"BTC", "ETH", "XRP", "LTC", "DASH"};
 
     public static void main(String... args) {
         Runner.runExample();
@@ -42,7 +36,6 @@ public class RestService extends AbstractVerticle {
     private InvestmentService investmentService;
     private StatisticsService statisticsService;
     private UserService authService;
-    private WebClient client;
     private Database db;
 
     public RestService(InvestmentService investmentService, StatisticsService statisticsService, UserService authService, Database db) {
@@ -59,7 +52,6 @@ public class RestService extends AbstractVerticle {
         AuthHandler authHandler = BasicAuthHandler.create(provider);
         authHandler.addAuthority("whatever");
 
-        client = WebClient.create(vertx);
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
         router.route().produces("application/json");
@@ -85,85 +77,43 @@ public class RestService extends AbstractVerticle {
 
         router.post("/api/users/signup").handler(createUserAccount());
 
-        router.get("/api/v1/ticks").handler(createTicksHandler());
-        router.get("/api/v1/snapshots/:period").handler(createSnapshotsHandler());
-        //router.get("/api/v1/snapshots/:currency/:period").handler(createSnapshotsHandler2());
-        router.get("/api/v1/marketcap").handler(createMarkerCapHandler());
-
         router.post("/api/v1/coins/buy").handler(createBuyCoinsHandler());
         router.post("/api/v1/coins/sell").handler(createSellCoinsHandler());
 
-        router.get("/api/v1/coins/transactions").handler(createGetTransactionsHandler());
+        router.get("/api/v1/coins/transactions").handler(ctx ->
+                investmentService.getTransactionsHistory(getUserId(ctx), event -> processArrayResponse(ctx, event)));
 
-        router.get("/api/v1/portfolio").handler(createInvestmentPortfolioHandler());
+        router.get("/api/v1/portfolio").handler(ctx ->
+                investmentService.getStackingCoins(getUserId(ctx), event -> processArrayResponse(ctx, event)));
 
         vertx.createHttpServer().requestHandler(router::accept).listen(8888);
     }
 
     private Handler<RoutingContext> createGetUserProfileHandler() {
-        return ctx -> {
-            System.out.println(ctx.user().principal().getString("_id"));
-            authService.getUserProfile(ctx.user().principal().getString("_id"), event -> {
-                if (event.succeeded()) {
-                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
-                } else {
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
-        };
+        return ctx -> authService.getUserProfile(ctx.user().principal().getString("_id"),
+                event -> processJsonResponse(ctx, event));
     }
 
     private Handler<RoutingContext> createUserAccount() {
         return ctx -> {
             try {
                 UserProfile profile = ctx.getBodyAsJson().mapTo(UserProfile.class);
-                authService.createUser(profile, event -> {
-                    if (event.succeeded()) {
-                        ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
-                    } else {
-                        ctx.response().setStatusCode(400).end();
-                    }
-                });
+                authService.createUser(profile, event -> processJsonResponse(ctx, event));
             } catch (IllegalArgumentException e) {
                 ctx.response().setStatusCode(400).end();
             }
         };
     }
 
-    private Handler<RoutingContext> createInvestmentPortfolioHandler() {
-        return ctx -> {
-            investmentService.getStackingCoins(getUserId(ctx), event -> {
-                if (event.succeeded()) {
-                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
-                }
-            });
-        };
-    }
-
-    private Handler<RoutingContext> createGetTransactionsHandler() {
-        return ctx -> {
-            investmentService.getTransactionsHistory(getUserId(ctx), event -> {
-                if (event.succeeded()) {
-                    ctx.response().setStatusCode(200).end(event.result().encodePrettily());
-                } else {
-                    event.cause().printStackTrace();
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
-        };
-    }
-
     private Handler<RoutingContext> createUserAuthHandler(RxAuthProvider provider) {
-        return ctx -> {
-            provider.authenticate(ctx.getBodyAsJson(), res -> {
-                if (res.succeeded()) {
-                    ctx.response().putHeader("Content-type", "application/json")
-                            .end(res.result().principal().encodePrettily());
-                } else {
-                    ctx.response().setStatusCode(401).end();
-                }
-            });
-        };
+        return ctx -> provider.authenticate(ctx.getBodyAsJson(), res -> {
+            if (res.succeeded()) {
+                ctx.response().putHeader("Content-type", "application/json")
+                        .end(res.result().principal().encodePrettily());
+            } else {
+                ctx.response().setStatusCode(401).end();
+            }
+        });
     }
 
     private Handler<RoutingContext> createSellCoinsHandler() {
@@ -171,13 +121,7 @@ public class RestService extends AbstractVerticle {
             final String userId = ctx.user().principal().getString("_id");
             final String currency = ctx.getBodyAsJson().getString("currency");
             final double amount = ctx.getBodyAsJson().getDouble("amount");
-            investmentService.sellCoins(userId, currency, amount, event -> {
-                if (event.succeeded()) {
-                    ctx.response().setStatusCode(200).end(event.result().encodePrettily());
-                } else {
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
+            investmentService.sellCoins(userId, currency, amount, event -> processJsonResponse(ctx, event));
         };
     }
 
@@ -187,52 +131,25 @@ public class RestService extends AbstractVerticle {
             final String userId = ctx.user().principal().getString("_id");
             final String currency = ctx.getBodyAsJson().getString("currency");
             final double amount = ctx.getBodyAsJson().getDouble("amount");
-            investmentService.buyCoins(userId, currency, amount, event -> {
-                if (event.succeeded()) {
-                    ctx.response().setStatusCode(200).end(new JsonObject().put("success", true).encodePrettily());
-                } else {
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
+            investmentService.buyCoins(userId, currency, amount, event -> processJsonResponse(ctx, event));
 
         };
     }
 
-    private Handler<RoutingContext> createSnapshotsHandler() {
-        return ctx -> {
-            statisticsService.getSnapshots(ctx.request().getParam("period"), event -> {
-                if (event.succeeded()) {
-                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
-                } else {
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
-        };
+    private void processJsonResponse(RoutingContext ctx, AsyncResult<JsonObject> event) {
+        if (event.succeeded()) {
+            ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
+        } else {
+            ctx.response().setStatusCode(400).end();
+        }
     }
 
-    private Handler<RoutingContext> createMarkerCapHandler() {
-        return ctx -> {
-            statisticsService.getMarketCaps(event -> {
-                if (event.succeeded()) {
-                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
-                } else {
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
-        };
-    }
-
-    private Handler<RoutingContext> createTicksHandler() {
-        return ctx -> {
-            statisticsService.getTicks(res -> {
-                if (res.succeeded()) {
-                    ctx.response().putHeader("Content-type", "application/json").end(res.result().encodePrettily());
-                } else {
-                    res.cause().printStackTrace();
-                    ctx.response().setStatusCode(400).end();
-                }
-            });
-        };
+    private void processArrayResponse(RoutingContext ctx, AsyncResult<JsonArray> event) {
+        if (event.succeeded()) {
+            ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
+        } else {
+            ctx.response().setStatusCode(400).end();
+        }
     }
 
     private String getUserId(RoutingContext ctx) {

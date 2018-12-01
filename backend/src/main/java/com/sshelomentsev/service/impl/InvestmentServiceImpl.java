@@ -75,12 +75,17 @@ public class InvestmentServiceImpl implements InvestmentService {
             statisticsService.getRate(currency, rate -> {
                 if (rate.succeeded()) {
                     transaction.setRate(rate.result());
-                    db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
+                    db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), event -> {
+                        if (event.succeeded()) {
+                            resultHandler.handle(new AsyncResultSuccess<>(new JsonObject().put("success", true)));
+                        } else {
+                            resultHandler.handle(new AsyncResultSuccess<>(new JsonObject().put("success", false)));
+                        }
+                    });
                 } else {
                     resultHandler.handle(new AsyncResultFailure<>("Unable to get rate for the specified currency"));
                 }
             });
-
         } else {
             resultHandler.handle(new AsyncResultFailure<>("Specified currency does not exist or is not served"));
         }
