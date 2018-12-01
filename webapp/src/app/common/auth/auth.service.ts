@@ -15,7 +15,11 @@ export class AuthService {
   private user: User;
 
   constructor(private http: Http, private router: Router) {
-    this.getUserInfo();
+    if (this.isAuthorized()) {
+      this.getUserInfo();
+    } else {
+      this.router.navigate(['/signup']);
+    }
   }
 
   public login(username: string, password: string) {

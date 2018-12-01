@@ -18,8 +18,7 @@ export class SignupService {
     const options = new RequestOptions({
       headers: headers
     });
-    this.http.post('http://localhost:8888/api/users/signup', userData, options).subscribe(res => {
-      console.log(res);
+    this.http.post(environment.usersUrl + 'signup', userData, options).subscribe(res => {
     });
   }
 
