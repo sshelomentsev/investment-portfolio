@@ -23,7 +23,7 @@ export class AuthService {
       username: username,
       password: password
     };
-    this.http.post(this.getBaseUrl() + 'login', body).subscribe(user => {
+    this.http.post(environment.usersUrl + 'login', body).subscribe(user => {
       if (user) {
         this.user = <User>user.json();
         localStorage.setItem(this.authStorageKey, btoa(username + ":" + password));
@@ -53,7 +53,7 @@ export class AuthService {
   }
 
   private getUserInfo() {
-    this.http.get(this.getBaseUrl() + 'profile').subscribe(user => {
+    this.http.get(environment.usersUrl + 'profile').subscribe(user => {
       if (user) {
         this.user = <User>user.json();
       } else {
@@ -61,10 +61,6 @@ export class AuthService {
         this.router.navigate(['/login']);
       }
     });
-  }
-
-  private getBaseUrl() {
-    return 'http://localhost:8888/api/users/';
   }
 
 }

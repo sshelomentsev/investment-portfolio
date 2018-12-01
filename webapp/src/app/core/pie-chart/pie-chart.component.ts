@@ -4,7 +4,6 @@ import { Chart } from "chart.js";
 import { StakingCoin } from 'src/app/model/staking-coin.model';
 
 import { ChartColorUtil } from '../chart-color-util';
-import { DataService } from 'src/app/common/data.service';
 
 @Component({
   selector: 'pie-chart',
@@ -23,7 +22,7 @@ export class PieChartComponent implements OnInit, AfterViewInit, OnChanges {
   @Input()
   coins: StakingCoin[] = [];
 
-  constructor(private el: ElementRef, private dataService: DataService) { }
+  constructor(private el: ElementRef) { }
 
   ngOnInit() {
     this.updateChart(this.coins);

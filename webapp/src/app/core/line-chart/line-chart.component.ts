@@ -38,7 +38,6 @@ export class LineChartComponent implements AfterViewInit {
   public lineChartLabels: Array<any> = [];
   public lineChartColors: Array<any> = [];
   public legendData: any[] = [];
-  private ready = false;
 
   constructor(private dataService: DataService) {
   }
@@ -81,7 +80,6 @@ export class LineChartComponent implements AfterViewInit {
           this.chart.chart = this.chart.getChartBuilder(this.chart.ctx);
         }, 0);
       }
-      this.ready = true;
     });
   }
 
@@ -92,10 +90,6 @@ export class LineChartComponent implements AfterViewInit {
       return moment(ts).format('DD MMM HH:mm');
     }
     return moment(ts).format('DD MMM');
-  }
-
-  public hasData() {
-    return this.ready;
   }
 
   public changePeriod(e, period: string) {

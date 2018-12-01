@@ -1,7 +1,7 @@
 <div class="row">
   <div class="section-title">Price compare</div>
   <div class="col">
-    <div *ngIf="ready" style="display: block;">
+    <div style="display: block;">
       <div class="legend">
         <div class="period-controls">
             <a *ngFor="let c of linkControls" class="period-control" [ngClass]="{'period-control-selected': c.selected}" (click)="changePeriod($event, c.arg)">{{c.name}}</a>

@@ -17,7 +17,7 @@ export class DataService {
   }
 
   public getSnapshots(period: string): Promise<Snapshot[]> {
-    const url = this.getBaseUrl() + 'snapshots/' + period;
+    const url = environment.apiUrl + 'snapshots/' + period;
     return new Promise<Snapshot[]>((resolve) => {
       this.get(url).subscribe(res => {
         resolve(<Snapshot[]>res.json());
@@ -26,7 +26,7 @@ export class DataService {
   }
 
   public getStackingCoins(): Promise<StakingCoin[]> {
-    const url = this.getBaseUrl() + 'portfolio';
+    const url = environment.apiUrl + 'portfolio';
     return new Promise<StakingCoin[]>((resolve) => {
       this.get(url).subscribe(res => {
         const coins: StakingCoin[] = <StakingCoin[]>res.json();
@@ -46,7 +46,7 @@ export class DataService {
   }
 
   public operateCoins(currency: string, amount: number, operation: string): Promise<any> {
-    const url = this.getBaseUrl() + 'coins/' + operation;
+    const url = environment.apiUrl + 'coins/' + operation;
     const info = {
       currency: currency,
       amount: amount
@@ -59,7 +59,7 @@ export class DataService {
   }
 
   public getTransactions(): Promise<Transaction[]> {
-    const url = this.getBaseUrl() + 'coins/transactions';
+    const url = environment.apiUrl + 'coins/transactions';
     return new Promise<any>((resolve) => {
       this.get(url).subscribe(res => resolve(res.json()));
     });
@@ -82,10 +82,6 @@ export class DataService {
       headers: headers
     });
     return this.http.get(url, options);
-  }
-
-  private getBaseUrl(): string {
-    return environment.apiUrl;
   }
 
 }

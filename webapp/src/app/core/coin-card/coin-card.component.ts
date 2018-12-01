@@ -29,7 +29,7 @@ export class CoinCardComponent implements OnInit {
     this.onBuy.emit(this.coin.currencyCode);
   }
 
-  sell(value) {
+  sell() {
     this.onSell.emit(this.coin.currencyCode);
   }
 
