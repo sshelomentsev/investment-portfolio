@@ -1,12 +1,18 @@
-table {
-  width: 100%;
+mat-table {
+  width: 700px;
 }
 
-mat-row.example-element-row:not(.example-expanded-row):hover {
+mat-row.element-row:not(.example-expanded-row):hover {
   background: #f5f5f5;
 }
 
-mat-row.example-element-row:not(.example-expanded-row):active {
+mat-row.element-row:not(.example-expanded-row):active {
   background: #efefef;
+}
+
+.section-title {
+  width: 100%;
+  margin: 12px 4px;
+  text-align: left;
 }
 

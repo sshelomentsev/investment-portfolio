@@ -20,6 +20,8 @@ import { CoinCardComponent } from './coin-card/coin-card.component';
 import { OperationDialogComponent } from './operation-dialog/operation-dialog.component';
 import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
 import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';
+import { PieChartComponent } from './pie-chart/pie-chart.component';
+import { TrendLineComponent } from './trend-line/trend-line.component';
 
 @NgModule({
   imports: [
@@ -48,7 +50,9 @@ import { TransactionHistoryComponent } from './transaction-history/transaction-h
     CoinCardComponent,
     OperationDialogComponent,
     NotificationDialogComponent,
-    TransactionHistoryComponent
+    TransactionHistoryComponent,
+    PieChartComponent,
+    TrendLineComponent
   ],
   entryComponents: [
     OperationDialogComponent,

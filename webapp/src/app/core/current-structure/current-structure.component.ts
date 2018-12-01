@@ -5,6 +5,7 @@ import { DataService } from 'src/app/common/data.service';
 import { StakingCoin } from '../../model/staking-coin.model';
 import { OperationDialogComponent } from '../operation-dialog/operation-dialog.component';
 import { NotificationDialogComponent } from '../notification-dialog/notification-dialog.component';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-current-structure',
@@ -16,6 +17,8 @@ export class CurrentStructureComponent implements OnInit {
   displayedColumns: string[] = ['coin', 'amount', 'usd', 'percent'];
 
   private data: StakingCoin[] = [];
+
+  private points: number[] = [15, 34, 15, 20, 13, 41];
 
   constructor(private dataService: DataService, public dialog: MatDialog) { }
 
@@ -48,7 +51,7 @@ export class CurrentStructureComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.updateData();
-      } else {
+      } else if (typeof result === "boolean" && !result)  {
         this.openNotification('This operation can not be performed');
       }
     });
@@ -58,6 +61,7 @@ export class CurrentStructureComponent implements OnInit {
     this.dataService.getStackingCoins().then(res => {
       this.data = res.sort((a, b) => b.rate - a.rate);
     });
+
   }
 
   private openNotification(status: string) {

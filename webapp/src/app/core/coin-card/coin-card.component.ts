@@ -11,6 +11,9 @@ export class CoinCardComponent implements OnInit {
   @Input()
   coin: StakingCoin;
 
+  @Input()
+  points: number;
+
   @Output()
   onBuy: EventEmitter<string> = new EventEmitter<string>();
 
@@ -23,12 +26,10 @@ export class CoinCardComponent implements OnInit {
   }
 
   buy() {
-    console.log('buy ' + this.coin.currencyCode);
     this.onBuy.emit(this.coin.currencyCode);
   }
 
   sell(value) {
-    console.log('sell ' + this.coin.currencyCode);
     this.onSell.emit(this.coin.currencyCode);
   }
 

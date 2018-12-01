@@ -1,0 +1,41 @@
+.trend-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container {
+  display: inline-block;
+  width: 120px;
+  height: 35px;
+}
+
+.min-max-label {
+  margin-left: 5px;
+  text-align: center;
+}
+
+.max-count {
+  font-size: 0.7em;
+}
+
+.min-count {
+  font-size: 0.7em;
+}
+
+.only-label {
+  text-align: center;
+  display: block;
+}
+
+.only-label > * {
+  margin-right: 5px;
+}
+
+.trend-label {
+  font-size: 80%;
+}
+
+[hidden] {
+  display: none
+}

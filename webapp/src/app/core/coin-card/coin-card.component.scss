@@ -1,68 +1,81 @@
-.coin-card {
-  margin: 4px;
-}
+:host(coin-card) {
 
-.currency-title {
-  width: 60px;
-}
+  mat-card {
+    width: 500px;
+    mat-card-header {
 
-.coin-title-icon {
-  width: 32px;
-  height: 32px;
-}
+    }
+  }
 
-.btc {
-  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/btc.svg)
-}
+  .coin-card {
+    margin: 4px;
+  }
 
-.eth {
-  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/eth.svg)
-}
+  .currency-title {
+    width: 60px;
+    margin-left: -28px;
+  }
 
-.xrp {
-  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/xrp.svg)
-}
+  .coin-title-icon {
+    width: 32px;
+    height: 32px;
+  }
 
-.ltc {
-  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/ltc.svg)
-}
+  .btc {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/btc.svg)
+  }
 
-.dash {
-  background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/dash.svg)
-}
+  .eth {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/eth.svg)
+  }
 
-.staking-amount {
-  padding-left: 40px;
-}
+  .xrp {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/xrp.svg)
+  }
 
-.change-by-period {
-  height: 100%;
-  width: 175px;
-  flex-grow: 0;
-  display: inline-block;
-  font-family: 'Allerta', serif;
-  font-size: 11px;
-  color: gray;
-}
+  .ltc {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/ltc.svg)
+  }
 
-.change {
-  font-size: 18px;
-}
+  .dash {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/dash.svg)
+  }
 
-.gain {
-  color: green;
-}
+  .staking-amount {
+    padding-left: 40px;
+    width: 200px;
+  }
 
-.loose {
-  color: red;
-}
+  .change-by-period {
+    height: 100%;
+    width: 156px;
+    padding: 2px 16px;
+    flex-grow: 0;
+    display: inline-block;
+    font-family: 'Allerta', serif;
+    font-size: 11px;
+    color: gray;
+  }
 
-.market-stats {
-  height: 100%;
-  width: 145px;
-  flex-grow: 0;
-  display: inline-block;
-  font-family: 'Allerta', serif;
-  font-size: 11px;
-  color: gray;
+  .change {
+    font-size: 18px;
+  }
+
+  .gain {
+    color: green;
+  }
+
+  .loose {
+    color: red;
+  }
+
+  .market-stats {
+    height: 100%;
+    width: 145px;
+    flex-grow: 0;
+    display: inline-block;
+    font-family: 'Allerta', serif;
+    font-size: 11px;
+    color: gray;
+  }
 }

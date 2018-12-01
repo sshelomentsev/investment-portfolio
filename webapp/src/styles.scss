@@ -162,7 +162,18 @@ table {
   align-content: stretch;
   .col {
     width: 600px;
-    min-width: 200px;
     margin: 0 20px 20px 20px;
+  }
+  .col-table {
+    width: 800px;
+    margin: 0 20px 20px 20px;
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+  .col-chart {
+    width: 450px;
+    margin: 0 20px 20px 20px;
+    flex-basis: 0;
+    flex-grow: 1;
   }
 }
