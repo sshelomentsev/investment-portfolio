@@ -7,7 +7,6 @@ import com.sshelomentsev.model.UserProfile;
 import com.sshelomentsev.service.UserService;
 import com.sshelomentsev.service.InvestmentService;
 import com.sshelomentsev.service.StatisticsService;
-import com.sshelomentsev.util.Runner;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -17,7 +16,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.ext.web.RoutingContext;
-import io.vertx.reactivex.ext.web.client.WebClient;
 import io.vertx.reactivex.ext.web.handler.AuthHandler;
 import io.vertx.reactivex.ext.web.handler.BasicAuthHandler;
 import io.vertx.reactivex.ext.web.handler.BodyHandler;
@@ -28,10 +26,6 @@ import io.vertx.reactivex.ext.web.sstore.LocalSessionStore;
 import io.vertx.reactivex.ext.web.sstore.SessionStore;
 
 public class RestService extends AbstractVerticle {
-
-    public static void main(String... args) {
-        Runner.runExample();
-    }
 
     private InvestmentService investmentService;
     private StatisticsService statisticsService;
@@ -77,12 +71,14 @@ public class RestService extends AbstractVerticle {
 
         router.post("/api/users/signup").handler(createUserAccount());
 
+        router.get("/api/v1/snapshots/:period").handler(ctx ->
+                statisticsService.getSnapshots(ctx.request().getParam("period"), event ->
+                        processArrayResponse(ctx, event)));
+
         router.post("/api/v1/coins/buy").handler(createBuyCoinsHandler());
         router.post("/api/v1/coins/sell").handler(createSellCoinsHandler());
-
         router.get("/api/v1/coins/transactions").handler(ctx ->
                 investmentService.getTransactionsHistory(getUserId(ctx), event -> processArrayResponse(ctx, event)));
-
         router.get("/api/v1/portfolio").handler(ctx ->
                 investmentService.getStackingCoins(getUserId(ctx), event -> processArrayResponse(ctx, event)));
 
@@ -127,7 +123,6 @@ public class RestService extends AbstractVerticle {
 
     private Handler<RoutingContext> createBuyCoinsHandler() {
         return ctx -> {
-            System.out.println(ctx.getBodyAsJson().encodePrettily());
             final String userId = ctx.user().principal().getString("_id");
             final String currency = ctx.getBodyAsJson().getString("currency");
             final double amount = ctx.getBodyAsJson().getDouble("amount");

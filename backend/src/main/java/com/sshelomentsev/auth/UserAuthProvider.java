@@ -35,7 +35,6 @@ public class UserAuthProvider implements AuthProvider {
                 if (event.succeeded() && 1 == event.result().size()) {
                     String hash = event.result().getJsonObject(0).getString("password");
                     if (BCrypt.checkpw((authInfo.getString("password")), hash)) {
-                        System.out.println(event.result().getJsonObject(0).encodePrettily());
                         JsonObject ret = event.result().getJsonObject(0);
                         ret.remove("password");
                         future.complete(event.result().getJsonObject(0));
@@ -48,7 +47,6 @@ public class UserAuthProvider implements AuthProvider {
             });
         }, event -> {
             if (event.succeeded()) {
-                System.out.println(event.result().getClass().getName());
                 handler.handle(Future.succeededFuture(new User(this, (JsonObject) event.result())));
             } else {
                 handler.handle(Future.failedFuture("No"));

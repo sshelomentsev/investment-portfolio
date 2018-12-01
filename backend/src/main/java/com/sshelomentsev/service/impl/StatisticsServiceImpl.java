@@ -99,7 +99,6 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private void getSnapshotsForCurrencies(List<String> currencies, String period, Handler<AsyncResult<JsonArray>> resultHandler) {
         if ("day".equals(period) || "month".equals(period) || "week".equals(period)) {
-            currencies.forEach(c -> System.out.println(c));
             List<Observable<JsonObject>> observables = currencies.stream()
                     .map(currency -> client.getAbs(getSnapshotsUrl(currency, period))
                             .rxSend()

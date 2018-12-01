@@ -22,7 +22,6 @@ public class Database {
     private ArangoDatabase database;
 
     public Database(Vertx vertx, JsonObject options, Handler<AsyncResult<Database>> handler) {
-        System.out.println("DB");
         this.vertx = vertx;
         vertx.executeBlocking(future -> {
             try {
