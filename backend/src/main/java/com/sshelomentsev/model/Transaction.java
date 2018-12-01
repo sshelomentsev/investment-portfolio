@@ -8,6 +8,7 @@ public class Transaction {
     private String user;
     private String currency;
     private Double amount;
+    private Double rate;
     private Operation operation;
     private long timestamp;
 
@@ -85,5 +86,13 @@ public class Transaction {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Double getRate() {
+        return rate;
+    }
+
+    public void setRate(Double rate) {
+        this.rate = rate;
     }
 }

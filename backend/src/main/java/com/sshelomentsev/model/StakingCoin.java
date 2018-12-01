@@ -10,6 +10,7 @@ public class StakingCoin {
     private Double hourChange;
     private Double dayChange;
     private Double weekChange;
+    private String marketCap;
 
     public StakingCoin() {
 
@@ -77,5 +78,13 @@ public class StakingCoin {
 
     public void setWeekChange(Double weekChange) {
         this.weekChange = weekChange;
+    }
+
+    public String getMarketCap() {
+        return marketCap;
+    }
+
+    public void setMarketCap(String marketCap) {
+        this.marketCap = marketCap;
     }
 }

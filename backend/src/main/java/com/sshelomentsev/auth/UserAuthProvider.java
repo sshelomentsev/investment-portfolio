@@ -27,7 +27,7 @@ public class UserAuthProvider implements AuthProvider {
         vertx.executeBlocking(future -> {
             final String query = "for u in user filter u.email == @email return " +
                     "{_id: u._id, email: u.email, password: u.password, " +
-                    "firstName: u.firstName, secondName: u.secondName, phoneNumber: u.phoneNumber}";
+                    "firstName: u.firstName, lastName: u.lastName, phoneNumber: u.phoneNumber}";
             Map<String, Object> bindVars = new MapBuilder()
                     .put("email", authInfo.getString("username"))
                     .get();

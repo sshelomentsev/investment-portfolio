@@ -13,6 +13,7 @@ import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.web.client.WebClient;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,6 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public StatisticsService getSnapshots(String period, Handler<AsyncResult<JsonArray>> resultHandler) {
         getSnapshotsForCurrencies(currencies, period, resultHandler);
-
         return this;
     }
 
@@ -63,7 +63,36 @@ public class StatisticsServiceImpl implements StatisticsService {
                 ret.add(json);
             }
             return ret;
-        }).subscribe(s -> resultHandler.handle(new AsyncResultSuccess<JsonArray>(s)));
+        }).subscribe(s -> resultHandler.handle(new AsyncResultSuccess<>(s)));
+
+        return this;
+    }
+
+    @Override
+    public StatisticsService getRate(String currency, Handler<AsyncResult<Double>> resultHandler) {
+        client.getAbs(getPriceUrl(currency)).rxSend().toObservable()
+                .map(resp -> resp.bodyAsJsonObject().getDouble("rate"))
+                .subscribe(s -> resultHandler.handle(new AsyncResultSuccess<>(s)));
+
+        return this;
+    }
+
+    @Override
+    public StatisticsService getMarketCaps(Handler<AsyncResult<JsonObject>> resultHandler) {
+        List<Observable<JsonObject>> observables = currencies.stream()
+                .map(currency -> client.getAbs(getMarketCapUrl(currency))
+                        .rxSend()
+                        .toObservable()
+                        .map(resp -> new JsonObject().put(currency, resp.bodyAsString().replaceAll("\"", ""))))
+                .collect(Collectors.toList());
+
+        Observable.zip(observables, jsons -> {
+            JsonObject ret = new JsonObject();
+            for (Object json : jsons) {
+                ret.mergeIn((JsonObject) json);
+            }
+            return ret;
+        }).subscribe(s -> resultHandler.handle(new AsyncResultSuccess<>(s)));
 
         return this;
     }
@@ -75,7 +104,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .map(currency -> client.getAbs(getSnapshotsUrl(currency, period))
                             .rxSend()
                             .toObservable()
-                            .map(resp -> new JsonObject().put("currency", currency).put("values", resp.bodyAsJsonArray())))
+                            .map(resp -> new JsonObject().put("currency", currency).put("values", sortShapshotItems(resp.bodyAsJsonArray()))))
                     .collect(Collectors.toList());
 
             Observable.zip(observables, jsons -> {
@@ -84,20 +113,27 @@ public class StatisticsServiceImpl implements StatisticsService {
                     ret.add(json);
                 }
                 return ret;
-            }).subscribe(res -> resultHandler.handle(new AsyncResultSuccess<JsonArray>(res)));
+            }).subscribe(res -> resultHandler.handle(new AsyncResultSuccess<>(res)));
         } else {
-            resultHandler.handle(new AsyncResultFailure("Incorrect period"));
+            resultHandler.handle(new AsyncResultFailure<>("Incorrect period"));
         }
     }
 
+    private JsonArray sortShapshotItems(JsonArray arr) {
+        return arr.stream().sorted(Comparator.comparingInt(a -> ((JsonArray) a).getInteger(0)))
+                .collect(JsonArray::new, JsonArray::add, JsonArray::add);
+    }
+
     private static String getPriceUrl(String currency) {
-        System.out.println("price url " + System.currentTimeMillis());
         return "https://api.cryptometr.io/api/v1/snapshots/ticker?from=" + currency + "&to=USD";
     }
 
     private static String getSnapshotsUrl(String currency, String period) {
-        System.out.println("price url " + System.currentTimeMillis());
         return "https://api.cryptometr.io/api/v1/snapshots/chart?from=" + currency + "&to=USD&period=" + period;
+    }
+
+    private static String getMarketCapUrl(String currency) {
+        return "https://api.cryptometr.io/api/v1/metrics-data/market-cap?currency=" + currency;
     }
 
 }

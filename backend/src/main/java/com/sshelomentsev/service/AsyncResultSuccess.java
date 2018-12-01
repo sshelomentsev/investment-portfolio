@@ -2,7 +2,7 @@ package com.sshelomentsev.service;
 
 import io.vertx.core.AsyncResult;
 
-public class AsyncResultSuccess<T> implements AsyncResult {
+public class AsyncResultSuccess<T> implements AsyncResult<T> {
 
     private T value;
 

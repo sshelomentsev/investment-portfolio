@@ -5,7 +5,7 @@ import com.sshelomentsev.rest.RestService;
 import com.sshelomentsev.service.UserService;
 import com.sshelomentsev.service.InvestmentService;
 import com.sshelomentsev.service.StatisticsService;
-import com.sshelomentsev.service.impl.AuthServiceImpl;
+import com.sshelomentsev.service.impl.UserServiceImpl;
 import com.sshelomentsev.service.impl.InvestmentServiceImpl;
 import com.sshelomentsev.service.impl.StatisticsServiceImpl;
 import io.vertx.core.DeploymentOptions;
@@ -27,7 +27,7 @@ public class AppVerticle extends AbstractVerticle {
                     if (dbEvent.succeeded()) {
                         StatisticsService statisticsService = new StatisticsServiceImpl(vertx, dbEvent.result()).initialize(e -> {});
                         InvestmentService investmentService = new InvestmentServiceImpl(dbEvent.result(), statisticsService).initialize(e -> {});
-                        UserService authService = new AuthServiceImpl(dbEvent.result());
+                        UserService authService = new UserServiceImpl(dbEvent.result());
 
                         vertx.getDelegate().deployVerticle(new RestService(investmentService, statisticsService, authService, dbEvent.result()), options);
                     }

@@ -2,7 +2,7 @@ package com.sshelomentsev.service;
 
 import io.vertx.core.AsyncResult;
 
-public class AsyncResultFailure implements AsyncResult {
+public class AsyncResultFailure<T> implements AsyncResult<T> {
 
     private final String errorMessage;
 
@@ -11,7 +11,7 @@ public class AsyncResultFailure implements AsyncResult {
     }
 
     @Override
-    public Object result() {
+    public T result() {
         return null;
     }
 

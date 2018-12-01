@@ -80,6 +80,8 @@ public class RestService extends AbstractVerticle {
             ctx.clearUser();
             ctx.response().setStatusCode(302).end();
         });
+        router.route("/api/users/profile").handler(authHandler);
+        router.get("/api/users/profile").handler(createGetUserProfileHandler());
 
         router.post("/api/users/signup").handler(createUserAccount());
 
@@ -98,6 +100,19 @@ public class RestService extends AbstractVerticle {
         vertx.createHttpServer().requestHandler(router::accept).listen(8888);
     }
 
+    private Handler<RoutingContext> createGetUserProfileHandler() {
+        return ctx -> {
+            System.out.println(ctx.user().principal().getString("_id"));
+            authService.getUserProfile(ctx.user().principal().getString("_id"), event -> {
+                if (event.succeeded()) {
+                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
+                } else {
+                    ctx.response().setStatusCode(400).end();
+                }
+            });
+        };
+    }
+
     private Handler<RoutingContext> createUserAccount() {
         return ctx -> {
             try {
@@ -110,7 +125,6 @@ public class RestService extends AbstractVerticle {
                     }
                 });
             } catch (IllegalArgumentException e) {
-                //e.printStackTrace();
                 ctx.response().setStatusCode(400).end();
             }
         };
@@ -198,23 +212,13 @@ public class RestService extends AbstractVerticle {
 
     private Handler<RoutingContext> createMarkerCapHandler() {
         return ctx -> {
-            List<Observable<JsonObject>> observables = Arrays.stream(currencies)
-                    .map(currency -> client.getAbs(getMarketCapUrl(currency))
-                            .rxSend()
-                            .toObservable()
-                            .map(resp -> new JsonObject().put(currency, resp.bodyAsString())))
-                    .collect(Collectors.toList());
-
-            Observable.zip(observables, jsons -> {
-                JsonArray ret = new JsonArray();
-                for (Object json : jsons) {
-                    ret.add(json);
+            statisticsService.getMarketCaps(event -> {
+                if (event.succeeded()) {
+                    ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
+                } else {
+                    ctx.response().setStatusCode(400).end();
                 }
-                return ret;
-            }).subscribe(res -> ctx
-                    .response()
-                    .putHeader("Content-type", "application/json")
-                    .end(res.encodePrettily()));
+            });
         };
     }
 
@@ -233,10 +237,6 @@ public class RestService extends AbstractVerticle {
 
     private String getUserId(RoutingContext ctx) {
         return ctx.user().principal().getString("_id");
-    }
-
-    private static String getMarketCapUrl(String currency) {
-        return "https://api.cryptometr.io/api/v1/metrics-data/market-cap?currency=" + currency;
     }
 
 }

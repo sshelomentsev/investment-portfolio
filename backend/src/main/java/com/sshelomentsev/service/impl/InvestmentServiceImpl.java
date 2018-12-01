@@ -7,6 +7,7 @@ import com.arangodb.velocypack.ValueType;
 import com.sshelomentsev.arangodb.Database;
 import com.sshelomentsev.model.Operation;
 import com.sshelomentsev.model.StakingCoin;
+import com.sshelomentsev.model.Tick;
 import com.sshelomentsev.model.Transaction;
 import com.sshelomentsev.service.AsyncResultFailure;
 import com.sshelomentsev.service.AsyncResultSuccess;
@@ -28,11 +29,12 @@ public class InvestmentServiceImpl implements InvestmentService {
             "            const user = params['user'];" +
             "            const currency = params['currency'];\n" +
             "            const amount = params['amount'];\n" +
+            "            const rate = params['rate'];\n" +
             "            let querySum = `for t in transaction filter t.user == \"${user}\" and t.currency == \"${currency}\" collect aggregate s = sum(t.amount) return s`\n"+
             "            let currAmount = db._query(querySum).toArray()[0]\n"+
             "            if (currAmount >= amount) {\n"+
             "                let amountToSave = -1 * amount;\n"+
-            "                db.transaction.save({user: user, operation: 'SELL', timestamp: new Date().getTime(), currency: currency, amount: amountToSave})\n"+
+            "                db.transaction.save({user: user, operation: 'SELL', rate: rate, timestamp: new Date().getTime(), currency: currency, amount: amountToSave})\n"+
             "                return {'success': true};\n"+
             "            }\n"+
             "            return {'success': false};\n"+
@@ -70,29 +72,48 @@ public class InvestmentServiceImpl implements InvestmentService {
     public InvestmentService buyCoins(String buyer, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler) {
         final Transaction transaction = new Transaction(buyer, currency, amount, Operation.BUY);
         if (currencies.containsKey(transaction.getCurrency())) {
-            db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
+            statisticsService.getRate(currency, rate -> {
+                if (rate.succeeded()) {
+                    transaction.setRate(rate.result());
+                    db.collection(TRANSACTION_COLLECTION_NAME).insert(JsonObject.mapFrom(transaction), resultHandler);
+                } else {
+                    resultHandler.handle(new AsyncResultFailure<>("Unable to get rate for the specified currency"));
+                }
+            });
+
         } else {
-            resultHandler.handle(new AsyncResultFailure("Specified currency does not exist or is not served"));
+            resultHandler.handle(new AsyncResultFailure<>("Specified currency does not exist or is not served"));
         }
         return this;
     }
 
     @Override
     public InvestmentService sellCoins(String seller, String currency, Double amount, Handler<AsyncResult<JsonObject>> resultHandler) {
-        final TransactionOptions options = new TransactionOptions().writeCollections(TRANSACTION_COLLECTION_NAME)
-                .params(new VPackBuilder().add(ValueType.OBJECT)
-                        .add("currency", currency)
-                        .add("user",seller)
-                        .add("amount", amount)
-                        .close().slice());
+        if (currencies.containsKey(currency)) {
+            statisticsService.getRate(currency, rate -> {
+                if (rate.succeeded()) {
+                    final TransactionOptions options = new TransactionOptions().writeCollections(TRANSACTION_COLLECTION_NAME)
+                            .params(new VPackBuilder().add(ValueType.OBJECT)
+                                    .add("currency", currency)
+                                    .add("user",seller)
+                                    .add("amount", amount)
+                                    .add("rate", rate.result())
+                                    .close().slice());
 
-        db.transaction(SELL_AQL_ACTION, options, event -> {
-            if (event.succeeded()) {
-                resultHandler.handle(new AsyncResultSuccess<JsonObject>(event.result()));
-            } else {
-                resultHandler.handle(new AsyncResultFailure(event.cause().getMessage()));
-            }
-        });
+                    db.transaction(SELL_AQL_ACTION, options, event -> {
+                        if (event.succeeded()) {
+                            resultHandler.handle(new AsyncResultSuccess<>(event.result()));
+                        } else {
+                            resultHandler.handle(new AsyncResultFailure<>(event.cause().getMessage()));
+                        }
+                    });
+                } else {
+                    resultHandler.handle(new AsyncResultFailure<>("Unable to get rate for the specified currency"));
+                }
+            });
+        } else {
+            resultHandler.handle(new AsyncResultFailure<>("Specified currency does not exist or is not served"));
+        }
         return this;
     }
 
@@ -105,8 +126,8 @@ public class InvestmentServiceImpl implements InvestmentService {
 
     @Override
     public InvestmentService getStackingCoins(String user, Handler<AsyncResult<JsonArray>> resultHandler) {
-        statisticsService.getTicks(res -> {
-            if (res.succeeded()) {
+        statisticsService.getTicks(ticks -> {
+            statisticsService.getMarketCaps(marketCaps -> {
                 db.query("for t in transaction filter t.user == @user return t", new MapBuilder().put("user", user).get(), event -> {
                     if (event.succeeded()) {
                         Map<String, Double> map = new HashMap<>();
@@ -118,30 +139,32 @@ public class InvestmentServiceImpl implements InvestmentService {
                             map.put(transaction.getCurrency(), currentAmount);
                         }
 
-                        JsonArray stackingCoins = new JsonArray();
-                        for (int i = 0; i < res.result().size(); i++) {
-                            final JsonObject tick = res.result().getJsonObject(i);
+                        JsonArray stakingCoins = new JsonArray();
+                        for (int i = 0; i < ticks.result().size(); i++) {
+                            Tick tick = ticks.result().getJsonObject(i).mapTo(Tick.class);
 
                             StakingCoin stakingCoin = new StakingCoin();
-                            stakingCoin.setCurrencyCode(tick.getString("currency"));
-                            stakingCoin.setCurrencyName(stakingCoin.getCurrencyCode());
-                            stakingCoin.setRate(tick.getDouble("rate"));
+                            stakingCoin.setCurrencyCode(tick.getCurrency());
+                            stakingCoin.setCurrencyName(currencies.get(stakingCoin.getCurrencyCode()));
+                            stakingCoin.setRate(tick.getRate());
 
                             final Double current = map.getOrDefault(stakingCoin.getCurrencyCode(), 0.0);
                             stakingCoin.setAmountCrypto(current);
                             stakingCoin.setAmountFiat(current * stakingCoin.getRate());
 
-                            stakingCoin.setHourChange(tick.getDouble("hour"));
-                            stakingCoin.setDayChange(tick.getDouble("day"));
-                            stakingCoin.setWeekChange(tick.getDouble("week"));
+                            stakingCoin.setHourChange(tick.getHour());
+                            stakingCoin.setDayChange(tick.getDay());
+                            stakingCoin.setWeekChange(tick.getWeek());
 
-                            stackingCoins.add(JsonObject.mapFrom(stakingCoin));
+                            stakingCoin.setMarketCap(marketCaps.result().getString(tick.getCurrency()));
+
+                            stakingCoins.add(JsonObject.mapFrom(stakingCoin));
                         }
 
-                        resultHandler.handle(new AsyncResultSuccess<JsonArray>(stackingCoins));
+                        resultHandler.handle(new AsyncResultSuccess<>(stakingCoins));
                     }
                 });
-            }
+            });
         });
 
         return this;
