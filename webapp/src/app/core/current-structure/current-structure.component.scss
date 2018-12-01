@@ -2,6 +2,13 @@ mat-table {
   width: 700px;
 }
 
+mat-header-row {
+  font-size: 12px;
+}
+mat-row.element-row {
+  font-size: 16px;
+}
+
 mat-row.element-row:not(.example-expanded-row):hover {
   background: #f5f5f5;
 }
@@ -10,9 +17,69 @@ mat-row.element-row:not(.example-expanded-row):active {
   background: #efefef;
 }
 
+mat-cell {
+  font-size: 20px;
+}
+
+.cell-coin {
+  max-width: 200px;
+}
+
+.cell-usd {
+  max-width: 200px;
+}
+
+.cell-amount {
+  max-width: 200px;
+}
+
+.cell-percent {
+  max-width: 80px;
+}
+
+
 .section-title {
   width: 100%;
   margin: 12px 4px;
   text-align: left;
 }
 
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.col-coins {
+  width: 500px;
+}
+
+.coin-text {
+  padding-left: 6px;
+}
+
+.coin-icon {
+  width: 32px;
+  height: 32px;
+  background-powsition: left;
+  background-repeat: no-repeat;
+  &.btc {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/btc.svg)
+  }
+
+  &.eth {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/eth.svg)
+  }
+
+  &.xrp {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/xrp.svg)
+  }
+
+  &.ltc {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/ltc.svg)
+  }
+
+  &.dash {
+    background-image: url(../../../../node_modules/cryptocurrency-icons/svg/color/dash.svg)
+  }
+}

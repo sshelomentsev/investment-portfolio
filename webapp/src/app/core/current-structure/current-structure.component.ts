@@ -18,7 +18,7 @@ export class CurrentStructureComponent implements OnInit {
 
   private data: StakingCoin[] = [];
 
-  private points: number[] = [15, 34, 15, 20, 13, 41];
+  private points: Map<string, number[]> = new Map();
 
   constructor(private dataService: DataService, public dialog: MatDialog) { }
 
@@ -57,11 +57,22 @@ export class CurrentStructureComponent implements OnInit {
     });
   }
 
+  getPoints(code: string): number[] {
+    if (this.points.has(code)) {
+      return this.points.get(code);
+    }
+    return [1,2,3,4,5,6];
+  }
+
   private updateData(): void {
     this.dataService.getStackingCoins().then(res => {
-      this.data = res.sort((a, b) => b.rate - a.rate);
+      this.dataService.getSnapshots('day').then(snapshots => {
+        this.data = res.sort((a, b) => b.rate - a.rate);
+        snapshots.forEach(s => {
+          this.points.set(s.currency, s.values.map(v => v[1]));
+        });
+      });
     });
-
   }
 
   private openNotification(status: string) {

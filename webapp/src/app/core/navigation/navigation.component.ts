@@ -35,6 +35,10 @@ export class NavigationComponent implements OnInit {
 
   }
 
+  public getUserName() {
+    return this.auth.getUserName();
+  }
+
   public onSelect(link: string) {
     this.router.navigate(['/' + link]);
   }

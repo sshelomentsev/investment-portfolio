@@ -6,6 +6,9 @@
           {{item.name | uppercase}}
         </a>
       </div>
+      <div *ngIf="!isAuthorized()" fxFlex class="user-info">
+          Hello, {{getUserName()}}
+      </div>
       <div fxFlex class="text-right">
         <a *ngIf="!isAuthorized()" routerLink="login">login</a>
         <a *ngIf="isAuthorized()" (click)="logout()">logout</a>

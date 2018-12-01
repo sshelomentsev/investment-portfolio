@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 
 import { MomentModule } from 'ngx-moment';
 
+import { ChartsModule } from 'ng2-charts';
+
 import { throwIfAlreadyLoaded } from './module-import.guard';
 
 import { NavigationComponent } from './navigation/navigation.component';
@@ -22,6 +24,7 @@ import { NotificationDialogComponent } from './notification-dialog/notification-
 import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';
 import { PieChartComponent } from './pie-chart/pie-chart.component';
 import { TrendLineComponent } from './trend-line/trend-line.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
 
 @NgModule({
   imports: [
@@ -31,14 +34,16 @@ import { TrendLineComponent } from './trend-line/trend-line.component';
     RouterModule,
     MaterialModule,
     SharedModule,
-    MomentModule
+    MomentModule,
+    ChartsModule
   ],
   exports: [
     NavigationComponent,
     FooterComponent,
     PageNotFoundComponent,
     CurrentStructureComponent,
-    MomentModule
+    MomentModule,
+    LineChartComponent
   ],
   declarations: [
     NavigationComponent,
@@ -52,7 +57,8 @@ import { TrendLineComponent } from './trend-line/trend-line.component';
     NotificationDialogComponent,
     TransactionHistoryComponent,
     PieChartComponent,
-    TrendLineComponent
+    TrendLineComponent,
+    LineChartComponent
   ],
   entryComponents: [
     OperationDialogComponent,

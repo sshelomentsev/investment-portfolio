@@ -5,23 +5,26 @@
     <div class="col-table left-col">
       <mat-table [dataSource]="getStakingCoins()" class="mat-elevation-z8">
         <ng-container matColumnDef="coin">
-          <mat-header-cell *matHeaderCellDef> Coin </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{element.currencyName}} </mat-cell>
+          <mat-header-cell class="cell-coin" *matHeaderCellDef> Coin </mat-header-cell>
+          <mat-cell class="cell-coin coin" *matCellDef="let element">
+            <div class="coin-icon {{element.currencyCode.toLowerCase()}}"></div>
+            <div class="coin-text">{{element.currencyName}}</div>
+          </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="amount">
-          <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{element.amountCrypto}} {{element.currencyCode}}</mat-cell>
+          <mat-header-cell class="cell-amount" *matHeaderCellDef> Amount </mat-header-cell>
+          <mat-cell class="cell-amount" *matCellDef="let element"> {{element.amountCrypto | number: '1.2-2'}} {{element.currencyCode}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="usd">
-          <mat-header-cell *matHeaderCellDef> USD </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{element.amountFiat | number: '1.0-2'}} </mat-cell>
+          <mat-header-cell class="cell-usd" *matHeaderCellDef> USD </mat-header-cell>
+          <mat-cell class="cell-usd" *matCellDef="let element"> {{element.amountFiat | number: '1.2-2'}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="percent">
-          <mat-header-cell *matHeaderCellDef> % </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{element.percent | number: '1.0-2'}} </mat-cell>
+          <mat-header-cell class="cell-percent" *matHeaderCellDef> % </mat-header-cell>
+          <mat-cell class="cell-percent" *matCellDef="let element"> {{element.percent | number: '1.2-2'}} </mat-cell>
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
@@ -39,14 +42,14 @@
   <div class="section-title">Staking coins</div>
 
   <div class="twoColFlex">
-    <div class="col left-col">
+    <div class="col-coins left-col">
       <div *ngFor="let coin of getCurrentStructure(0)">
-        <coin-card [coin]="coin" [points]="points" (onBuy)="buy($event)" (onSell)="sell($event)"></coin-card>
+        <coin-card [coin]="coin" [points]="getPoints(coin.currencyCode)" (onBuy)="buy($event)" (onSell)="sell($event)"></coin-card>
       </div>
     </div>
-    <div class="col right-col">
+    <div class="col-coins right-col">
       <div *ngFor="let coin of getCurrentStructure(1)">
-        <coin-card [coin]="coin" [points]="points" (onBuy)="buy($event)" (onSell)="sell($event)"></coin-card>
+        <coin-card [coin]="coin" [points]="getPoints(coin.currencyCode)" (onBuy)="buy($event)" (onSell)="sell($event)"></coin-card>
       </div>
     </div>
 

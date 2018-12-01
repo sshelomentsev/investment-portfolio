@@ -3,7 +3,7 @@ import { Component, OnInit, AfterViewInit, Input, ElementRef } from '@angular/co
 import { Chart } from "chart.js";
 import { StakingCoin } from 'src/app/model/staking-coin.model';
 
-import { PieFilterDataUtils } from './pie-filter-data-utils';
+import { ChartColorUtil } from '../chart-color-util';
 import { DataService } from 'src/app/common/data.service';
 
 @Component({
@@ -16,6 +16,8 @@ export class PieChartComponent implements OnInit, AfterViewInit {
   private readonly borderWidth: number = 4;
   private readonly canvasHeight: number = 400;
   private readonly canvasWidth: number = 400;
+
+  private data: StakingCoin[] = [];
 
   private chart: any = undefined;
   public hasData: boolean = true;
@@ -34,33 +36,26 @@ export class PieChartComponent implements OnInit, AfterViewInit {
     canvas.height = this.canvasHeight;
     canvas.width = this.canvasWidth;
     const context = canvas.getContext('2d');
-    context.fillText('QQQ', 10, 10);
     this.chart = new Chart(context, config);
-    console.log(this.chart);
-    let text = "75%",
-        textX = Math.round((400 - context.measureText(text).width) / 2),
-        textY = 400 / 2;
-
-    context.fillText(text, textX, textY);
     this.chart.update();
     this.chart.render();
   }
 
   private updateChart(): void {
     this.dataService.getStackingCoins().then(data => {
+      this.data = data;
       if (undefined == this.chart) {
         this.createChartConfig(data).then(config => {
           this.createAndRenderChart(config);
         });
       } else {
-      const dataset = this.chart.data.datasets[0];
-      dataset.data = data.map(item => item.amountCrypto);
-      dataset.backgroundColor = data.map((item, i) => PieFilterDataUtils.colorScheme[i]);
+        const dataset = this.chart.data.datasets[0];
+        dataset.data = data.map(item => item.amountCrypto);
 
-      this.chart.data.labels = data.map(item => item.currencyCode);
+        this.chart.data.labels = data.map(item => item.currencyCode);
 
-      this.chart.update();
-      this.chart.render();
+        this.chart.update();
+        this.chart.render();
       }
     });
   }
@@ -69,8 +64,9 @@ export class PieChartComponent implements OnInit, AfterViewInit {
     return new Promise<any>((resolve) => {
       const config = {
         type: 'doughnut',
-        data: PieFilterDataUtils.prepareDataset(data, this.borderWidth),
+        data: this.prepareDataset(data, this.borderWidth),
         options: {
+          cutoutPercentage: 80,
           maintainAspectRatio: true,
           responsive: true,
           title: {
@@ -81,25 +77,13 @@ export class PieChartComponent implements OnInit, AfterViewInit {
             animateScale: false,
             duration: 100
           },
-          //onClick: (event, chartSegments) => this.onSegmentClickHandler(event, chartSegments),
+          onHover: (event, chartSegments) => this.updateTextOnClick(event, chartSegments),
+          onClick: (event, chartSegments) => this.updateTextOnClick(event, chartSegments),
           legend: {
             display: false
           },
           tooltips: {
-            enabled: true,
-            position: 'nearest',
-            callbacks: {
-              title: (tooltipItem, data) => data.labels[tooltipItem[0].index],
-              afterTitle: (tooltipItem, data) => this.calculatePercentageForSegment(tooltipItem[0].index, data.datasets[0].data),
-              label: () => ''
-            }
-          },
-          elements: {
-            center: {
-              text: 'AAA',
-              fontStyle: 'Arial',
-              sidePadding: 20,
-            }
+            enabled: false
           }
         }
       };
@@ -108,11 +92,48 @@ export class PieChartComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private calculatePercentageForSegment(segmentIndex: number, data: any[]): string {
-    const sum = data.reduce((a, b) => a + b);
-    const count = data[segmentIndex];
-    const percent = (100 * count / sum).toFixed(2);
-    return percent + '%';
+  private updateTextOnClick(event, chartSegments) {
+    if (chartSegments.length > 0) {
+      const chart = chartSegments[0]._chart;
+      const index = chartSegments[0]._index;
+      const data = this.data[index];
+
+      const title = data.currencyName + ' (' + data.currencyCode + ')';
+      const rate = '$' + this.data[index].rate.toFixed(2);
+      const marketCap = '$' + this.data[index].marketCap;
+
+      const ctx = chart.ctx;
+
+      this.writeLine(ctx, title, 24, 200, 136);
+      this.writeLine(ctx, 'Price', 12, 200, 190);
+      this.writeLine(ctx, rate, 20, 200, 210);
+      this.writeLine(ctx, 'Market cap', 12, 200, 250);
+      this.writeLine(ctx, marketCap, 20, 200, 270);
+    }
+  }
+
+  private writeLine(ctx, content, size, x, y) {
+    ctx.fillStyle = 'black';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.font = '' + size + 'px Lato';
+
+    ctx.fillText(content, x, y);
+  }
+
+  private prepareDataset(sourceData: StakingCoin[], borderWidth: number): any {
+    const data = {
+      datasets: [{
+        data: sourceData.map(item => item.amountFiat),
+        backgroundColor: sourceData.map((item, i) => ChartColorUtil.getColorCode(item.currencyCode)),
+        borderColor: new Array(sourceData.length).fill('#808080'),
+        borderWidth: new Array(sourceData.length).fill(0),
+        hoverBorderColor: new Array(sourceData.length).fill('#005064'),
+        hoverBorderWidth: borderWidth
+      }],
+      labels: sourceData.map(item => item.currencyCode)
+    };
+    return data;
   }
 
 }

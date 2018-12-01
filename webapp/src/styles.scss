@@ -153,6 +153,10 @@ table {
     border-spacing: 0;
 }
 
+.row {
+  max-width: 1200px;
+}
+
 .twoColFlex {
   display: flex;
   align-items: flex-start;

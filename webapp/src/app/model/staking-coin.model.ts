@@ -9,5 +9,6 @@ export class StakingCoin {
   dayChange: number;
   weekChange: number;
   percent: number;
+  marketCap: string;
 
 }

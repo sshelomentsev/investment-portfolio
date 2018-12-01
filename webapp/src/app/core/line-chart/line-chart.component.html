@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="section-title">Price compare</div>
+  <div class="col">
+    <div *ngIf="ready" style="display: block;">
+      <div class="legend">
+        <div class="period-controls">
+            <a *ngFor="let c of linkControls" class="period-control" [ngClass]="{'period-control-selected': c.selected}" (click)="changePeriod($event, c.arg)">{{c.name}}</a>
+        </div>
+        <div class="coin-controls">
+            <a class="legend-control {{item.clazz}}" *ngFor="let item of legendData" (click)="updateDataset($event, item.index)" >{{item.text}}</a>
+        </div>
+      </div>
+      <canvas baseChart width="1000" height="400"
+        [datasets]="lineChartData"
+        [labels]="lineChartLabels"
+        [options]="lineChartOptions"
+        [colors]="lineChartColors"
+        [legend]="false"
+        [chartType]="lineChartType">
+      </canvas>
+    </div>
+  </div>
+</div>

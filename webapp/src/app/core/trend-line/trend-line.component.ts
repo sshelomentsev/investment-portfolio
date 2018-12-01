@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, SimpleChanges, OnChanges } from '@angular/core';
 
 import { Chart } from 'chart.js';
 
@@ -7,93 +7,65 @@ import { Chart } from 'chart.js';
   templateUrl: './trend-line.component.html',
   styleUrls: ['./trend-line.component.scss']
 })
-export class TrendLineComponent implements OnInit {
+export class TrendLineComponent implements OnInit, OnChanges {
 
   private chartConfig: any = null;
   private chart: any = null;
 
-  private dataPoints: number[];
-
   constructor(private el: ElementRef) { }
 
   ngOnInit() {
+    this.refreshChart(this.points);
   }
 
-  public hasDataPoints(): boolean {
-    return this.dataPoints !== null && this.dataPoints !== undefined && this.dataPoints.length > 0;
-  }
+  @Input()
+  points: number[] = [2,3,4,19,29];
 
-  @Input('points')
-  set points(points: number[]) {
-    const oldDataPoints = this.dataPoints;
-    this.dataPoints = points;
-
-    // the data points is updated.
-    if (this.showTrendLine()) {
-      if (oldDataPoints !== points) {
-        // if the old data points and the new ones are different, refresh the chart
-        if (oldDataPoints == null || points == null || oldDataPoints.length !== points.length) {
-          // if the number of data point change, need a "hard" refresh of the chart
-          this.refreshChart(true);
-        } else {
-          // if the number o data point are the same, only refresh the data
-          this.refreshChart(false);
-        }
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['points']) {
+      const ch = changes['points'];
+      if (!this.isEqual(ch.previousValue, ch.currentValue)) {
+        this.refreshChart(ch.currentValue);
       }
     }
   }
 
-  get points(): number[] {
-    return this.dataPoints;
+  private isEqual(arr1: any[], arr2: any[]) {
+    if (!arr1 || !arr2) {
+      return false;
+    }
+    if (arr1.length !== arr2.length) {
+      false;
+    }
+
+    return arr1.filter((v, i) => v === arr2[i]).length == arr1.length;
   }
 
-  private refreshChart(destroyNeeded: boolean) {
-    if (destroyNeeded) {
-      if (this.chart) {
-        this.chart.destroy();
-      }
+  private refreshChart(points: number[]) {
+    if (undefined == this.chart) {
       const canvas = <HTMLCanvasElement>this.el.nativeElement.querySelector('canvas');
       const context = canvas.getContext('2d');
 
-      this.prepareChartConfig();
+      this.prepareChartConfig(points);
       this.chart = new Chart(context, this.chartConfig);
     } else {
-      this.chartConfig.data.datasets[0].data = this.dataPoints;
+      this.chartConfig.data.datasets[0].data = this.points;
       this.chart.update();
     }
 
   }
 
-  public showTrendLine(): boolean {
-    if (this.dataPoints) {
-      return true;
-    } else {
-      return this.dataChanged();
-    }
-    return false;
-  }
-
-  private dataChanged() {
-    if (this.dataPoints && this.dataPoints.length > 0) {
-      const firstElem = this.dataPoints[0];
-      return this.points.some(elem => elem !== firstElem);
-    } else {
-      return false;
-    }
-  }
-
-  private prepareChartConfig() {
+  private prepareChartConfig(points: number[]) {
     this.chartConfig = {
       type: 'line',
       data: {
-        labels: this.dataPoints,
+        labels: points,
         datasets: [{
-          backgroundColor: 'dark',
-          borderColor: 'dark',
-          borderWidth: 1,
+          borderColor: points[0] < points[points.length - 1] ? 'green' : 'red',
+          borderWidth: 2,
           lineTension: 0,
-          pointRadius: 1,
-          data: this.dataPoints,
+          pointRadius: 0,
+          data: points,
           fill: false
         }]
       },
