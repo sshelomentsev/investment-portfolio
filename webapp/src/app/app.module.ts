@@ -17,6 +17,7 @@ import { SharedModule } from './shared/shared.module';
 import { CanActivateAuthGuard } from './can-activate.authguard';
 import { DataService } from './common/data.service';
 import { SignupService } from './common/signup.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { SignupService } from './common/signup.service';
     AuthService,
     CanActivateAuthGuard,
     DataService,
-    SignupService
+    SignupService,
+    CookieService
   ],
   bootstrap: [AppComponent]
 })

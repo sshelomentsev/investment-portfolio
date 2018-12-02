@@ -1,8 +1,6 @@
 package com.sshelomentsev.rest;
 
 import com.sshelomentsev.arangodb.Database;
-import com.sshelomentsev.auth.RxAuthProvider;
-import com.sshelomentsev.auth.UserAuthProvider;
 import com.sshelomentsev.model.AsyncResultFailure;
 import com.sshelomentsev.model.UserProfile;
 import com.sshelomentsev.service.UserService;
@@ -14,13 +12,17 @@ import io.vertx.core.Handler;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.KeyStoreOptions;
+import io.vertx.reactivex.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthOptions;
+import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import io.vertx.reactivex.ext.web.handler.AuthHandler;
-import io.vertx.reactivex.ext.web.handler.BasicAuthHandler;
 import io.vertx.reactivex.ext.web.handler.BodyHandler;
 import io.vertx.reactivex.ext.web.handler.CookieHandler;
+import io.vertx.reactivex.ext.web.handler.JWTAuthHandler;
 import io.vertx.reactivex.ext.web.handler.SessionHandler;
 import io.vertx.reactivex.ext.web.handler.UserSessionHandler;
 import io.vertx.reactivex.ext.web.sstore.LocalSessionStore;
@@ -42,10 +44,14 @@ public class RestService extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> startFuture) {
-        UserAuthProvider authProvider = new UserAuthProvider(vertx, db);
-        RxAuthProvider provider = new RxAuthProvider(authProvider);
-        AuthHandler authHandler = BasicAuthHandler.create(provider);
-        authHandler.addAuthority("whatever");
+        JWTAuthOptions config = new JWTAuthOptions()
+                .setKeyStore(new KeyStoreOptions()
+                        .setPath("keystore.jceks")
+                        .setPassword("secret"));
+
+
+        JWTAuth authProvider = JWTAuth.create(vertx, config);
+        AuthHandler authHandler = JWTAuthHandler.create(authProvider);
 
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
@@ -58,12 +64,13 @@ public class RestService extends AbstractVerticle {
         SessionHandler sessionHandler = SessionHandler.create(store);
         router.route().handler(sessionHandler);
 
-        router.route().handler(UserSessionHandler.create(provider));
+        router.route().handler(UserSessionHandler.create(authProvider));
+
 
         router.route("/api/v1/*").handler(authHandler);
 
 
-        router.post("/api/users/login").handler(createUserAuthHandler(provider));
+        router.post("/api/users/login").handler(createUserAuthHandler(authProvider));
         router.post("/api/users/logout").handler(ctx -> {
             ctx.clearUser();
             ctx.response().setStatusCode(200).end();
@@ -88,8 +95,11 @@ public class RestService extends AbstractVerticle {
     }
 
     private Handler<RoutingContext> createGetUserProfileHandler() {
-        return ctx -> userService.getUserProfile(ctx.user().principal().getString("_id"),
-                event -> processJsonResponse(ctx, event));
+        return ctx -> {
+            userService.getUserProfile(ctx.user().principal().getString("_id"),
+                    event -> processJsonResponse(ctx, event));
+        };
+
     }
 
     private Handler<RoutingContext> createUserAccount() {
@@ -104,18 +114,25 @@ public class RestService extends AbstractVerticle {
         };
     }
 
-    private Handler<RoutingContext> createUserAuthHandler(RxAuthProvider provider) {
-        return ctx -> provider.authenticate(ctx.getBodyAsJson(), res -> {
-            if (res.succeeded()) {
-                ctx.response().putHeader("Content-type", "application/json")
-                        .end(res.result().principal().encodePrettily());
-            } else {
-                res.cause().printStackTrace();
-                ctx.response().setStatusCode(401)
-                        .end(new JsonObject().put("success", false).put("error", res.cause().getMessage())
-                                .encodePrettily());
-            }
-        });
+    private Handler<RoutingContext> createUserAuthHandler(JWTAuth provider) {
+        return ctx -> {
+            final String username = ctx.getBodyAsJson().getString("username");
+            final String password = ctx.getBodyAsJson().getString("password");
+            userService.authenticate(username, password, event -> {
+                if (event.succeeded()) {
+                    final String token = provider.generateToken(new JsonObject().
+                            put(username, password).put("_id", event.result().getString("_id")), new JWTOptions());
+                    final JsonObject ret = event.result().put("token", token);
+                    ctx.response().putHeader("Content-type", "application/json")
+                            .end(ret.encodePrettily());
+                } else {
+                    event.cause().printStackTrace();
+                    ctx.response().setStatusCode(401)
+                            .end(new JsonObject().put("success", false).put("error", event.cause().getMessage())
+                                    .encodePrettily());
+                }
+            });
+        };
     }
 
     private Handler<RoutingContext> createSellCoinsHandler() {

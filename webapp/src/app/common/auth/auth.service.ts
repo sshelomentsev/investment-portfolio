@@ -6,6 +6,7 @@ import { User } from '../../model/user.model';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
 
   private user: User = undefined;
 
-  constructor(private http: Http, private router: Router) {
+  constructor(private http: Http, private router: Router, private cookieService: CookieService) {
     this.hasAuth().then(isAuth => {
       if (!isAuth) {
         this.router.navigate([this.hasAuthKey() ? '/login' : '/signup']);
@@ -33,7 +34,7 @@ export class AuthService {
       this.http.post(environment.usersUrl + 'login', body).subscribe(
         user => {
           this.user = <User>user.json();
-          localStorage.setItem(this.authStorageKey, btoa(username + ":" + password));
+          this.cookieService.set('token', this.user.token);
           resolve({success: true});
         },
         err => {
@@ -52,14 +53,14 @@ export class AuthService {
 
   public logout() {
     this.http.post(environment.usersUrl + 'logout', {}).subscribe(s => {
-      localStorage.removeItem(this.authStorageKey);
       this.user = undefined;
+      this.cookieService.delete('token');
       this.router.navigate(['/login']);
     });
   }
 
   public getAuth(): string {
-    return 'Basic ' + localStorage.getItem(this.authStorageKey);
+    return 'bearer ' + this.cookieService.get('token');
   }
 
   public isAuthorized() {
@@ -76,6 +77,7 @@ export class AuthService {
       this.getUserInfo().subscribe(
         user => {
           this.user = <User>user.json();
+          this.cookieService.set('token', this.user.token);
           resolve(true);
         },
         err => {
@@ -86,7 +88,8 @@ export class AuthService {
   }
 
   private hasAuthKey() {
-    return null !== localStorage.getItem(this.authStorageKey) && undefined !== localStorage.getItem(this.authStorageKey);
+    console.log(this.cookieService.get('token'));
+    return null !== this.cookieService.get('token') && undefined !== this.cookieService.get('token') && '' !== this.cookieService.get('token');
   }
 
   private getUserInfo(): Observable<any> {

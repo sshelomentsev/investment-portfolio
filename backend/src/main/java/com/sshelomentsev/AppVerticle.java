@@ -27,7 +27,7 @@ public class AppVerticle extends AbstractVerticle {
                     if (dbEvent.succeeded()) {
                         StatisticsService statisticsService = new StatisticsServiceImpl(vertx, dbEvent.result()).initialize(e -> {});
                         InvestmentService investmentService = new InvestmentServiceImpl(dbEvent.result(), statisticsService).initialize(e -> {});
-                        UserService authService = new UserServiceImpl(dbEvent.result());
+                        UserService authService = new UserServiceImpl(vertx.getDelegate(), dbEvent.result());
 
                         vertx.getDelegate().deployVerticle(new RestService(investmentService, statisticsService, authService, dbEvent.result()), options);
                     }

@@ -76,7 +76,9 @@ export class SignupComponent implements OnInit {
     value.password = value.matchingPasswords.createPassword;
     delete value.matchingPasswords;
     this.signupService.signup(form.value).subscribe(
-      data => this.router.navigate(['/performance']),
+      data => {
+        this.router.navigate(['/login']);
+      },
       err => {
         this.hasError = true;
         this.errorMessage = err.json().error;
