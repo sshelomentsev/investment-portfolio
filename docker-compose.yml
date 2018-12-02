@@ -28,3 +28,7 @@ services:
       - "3000:80"
     links:
       - backend:backend
+    depends_on:
+      - backend
+    environment:
+      WAIT_HOSTS: backend:8888

@@ -9,6 +9,5 @@ db.currency.save({code: 'XRP', name: 'Ripple'});
 db.currency.save({code: 'ETH', name: 'Ethereum'});
 db.currency.save({code: 'DASH', name: 'Dash'});
 db.currency.save({code: 'LTC', name: 'Litecoin'});
-db.currency.save({code: 'USD', name: 'United States Dollar', type: 'fiat'});
 
 db._create("transaction");
