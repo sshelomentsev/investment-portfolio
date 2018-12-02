@@ -16,6 +16,16 @@ export class LineChartComponent implements AfterViewInit {
   @ViewChild(BaseChartDirective)
   public chart: BaseChartDirective;
 
+  public ready = false;
+
+  public readonly lineChartLegend: boolean = true;
+  public readonly lineChartType: string = 'line';
+
+  public lineChartData: Array<any> = [];
+  public lineChartLabels: Array<any> = [];
+  public lineChartColors: Array<any> = [];
+  public legendData: any[] = [];
+
   public linkControls = [
     {
       name: '1D',
@@ -34,10 +44,7 @@ export class LineChartComponent implements AfterViewInit {
     }
   ];
 
-  public lineChartData: Array<any> = [];
-  public lineChartLabels: Array<any> = [];
-  public lineChartColors: Array<any> = [];
-  public legendData: any[] = [];
+
 
   constructor(private dataService: DataService) {
   }
@@ -82,6 +89,7 @@ export class LineChartComponent implements AfterViewInit {
           this.chart.chart = this.chart.getChartBuilder(this.chart.ctx);
         }, 0);
       }
+      this.ready = true;
     });
   }
 
@@ -117,7 +125,8 @@ export class LineChartComponent implements AfterViewInit {
       xAxes: [{
         ticks: {
           autoSkip: true,
-          maxRotation: 0
+          maxRotation: 0,
+          maxTicksLimit: 20
         }
       }],
       yAxes: [{
@@ -181,9 +190,5 @@ export class LineChartComponent implements AfterViewInit {
       classList.add(hiddenClass);
     }
   };
-
-
-  public lineChartLegend: boolean = true;
-  public lineChartType: string = 'line';
 
 }
