@@ -14,7 +14,7 @@ EXPOSE 8888
 COPY target/$VERTICLE_FILE $VERTICLE_HOME/
 
 # Copy app config file
-COPY conf/config.json $VERTICLE_HOME/
+COPY conf/config_docker.json $VERTICLE_HOME/config.json
 
 # Launch the verticle
 WORKDIR $VERTICLE_HOME
