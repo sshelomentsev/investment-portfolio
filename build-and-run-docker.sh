@@ -2,8 +2,9 @@
 
 mvn clean package -f backend/pom.xml
 
+npm install
 cd webapp
-ng build --prod
+npm run ng --prod
 cd ..
 
 docker-compose up --build --force-recreate
