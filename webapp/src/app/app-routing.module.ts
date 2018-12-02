@@ -11,7 +11,7 @@ import { UserProfileComponent } from './core/user-profile/user-profile.component
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/',
+    redirectTo: '/performance',
     pathMatch: 'full'
   },
   {
