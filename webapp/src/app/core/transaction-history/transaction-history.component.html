@@ -11,12 +11,12 @@
 
         <ng-container matColumnDef="amount">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
-          <td mat-cell *matCellDef="let row"> {{row.amount | number: '1.0-2'}} </td>
+          <td mat-cell *matCellDef="let row"> {{row.amount | number: '1.2-2'}} {{row.currency}} </td>
         </ng-container>
 
         <ng-container matColumnDef="USD">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> USD </th>
-            <td mat-cell *matCellDef="let row"> {{row.amountFiat | number: '1.0-2'}} </td>
+            <td mat-cell *matCellDef="let row"> {{row.amountFiat | number: '1.2-2'}} </td>
           </ng-container>
 
         <ng-container matColumnDef="currency">
