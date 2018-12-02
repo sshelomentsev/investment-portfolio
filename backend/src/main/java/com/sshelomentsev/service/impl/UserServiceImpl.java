@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserService createUser(UserProfile userProfile, Handler<AsyncResult<JsonObject>> resultHandler) {
-        db.query("for u in user filter user.email == @email return u",
+        db.query("for u in user filter u.email == @email return u",
                 new MapBuilder().put("email", userProfile.getEmail()).get(), event -> {
             if (event.succeeded()) {
                 if (0 == event.result().size()) {
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         db.query("for u in user filter u._id == @id return {email: u.email, firstName: u.firstName, " +
                 "lastName: u.lastName, phoneNumber: u.phoneNumber}", new MapBuilder().put("id", user).get(), event -> {
             if (event.succeeded()) {
-                resultHandler.handle(new AsyncResultSuccess<JsonObject>(event.result().getJsonObject(0)));
+                resultHandler.handle(new AsyncResultSuccess<>(event.result().getJsonObject(0)));
             } else {
                 resultHandler.handle(new AsyncResultFailure<>("Unable to finish user request"));
             }

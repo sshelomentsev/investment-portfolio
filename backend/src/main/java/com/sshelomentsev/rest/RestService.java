@@ -95,8 +95,10 @@ public class RestService extends AbstractVerticle {
         return ctx -> {
             try {
                 UserProfile profile = ctx.getBodyAsJson().mapTo(UserProfile.class);
+                System.out.println(ctx.getBodyAsJson().encodePrettily());
                 authService.createUser(profile, event -> processJsonResponse(ctx, event));
             } catch (IllegalArgumentException e) {
+                e.printStackTrace();
                 ctx.response().setStatusCode(400).end();
             }
         };
@@ -136,6 +138,7 @@ public class RestService extends AbstractVerticle {
         if (event.succeeded()) {
             ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
         } else {
+            event.cause().printStackTrace();
             ctx.response().setStatusCode(400).end();
         }
     }
