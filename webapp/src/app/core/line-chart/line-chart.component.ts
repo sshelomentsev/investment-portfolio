@@ -48,6 +48,8 @@ export class LineChartComponent implements AfterViewInit {
 
   private updateData(period: string) {
     this.dataService.getSnapshots(period).then(res => {
+      // sort currencies in rate order
+      res = res.sort((a, b) => b.values[a.values.length-1][1] - a.values[b.values.length-1][1]);
       this.lineChartData = [];
       this.legendData = [];
       res.forEach((d, index) => {
