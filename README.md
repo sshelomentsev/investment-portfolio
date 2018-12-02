@@ -19,7 +19,7 @@ A test application to manage investment portfolio.
   * ```docker-compose up```
 4) Open http://localhost:3000/ in your browser.  
 
-If you need to run it locally, then you need
+### If you need to run it locally, then you need
 1) Install ArangoDB and initialize database by using database/Dockerfile or manual installation and executing an init script database/init-database.sh (Please refer to https://docs.arangodb.com/3.0/Manual/Administration/Arangosh/ in case of how to run shell script in ArangoDB).
 2) Specify database settings into backend config (backend/conf/config)
 3) Build and run backend by
