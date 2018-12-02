@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class SignupService {
@@ -13,17 +14,13 @@ export class SignupService {
   constructor(private http: Http, private router: Router) {
   }
 
-  signup(userData: any) {
+  signup(userData: any): Observable<any> {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
     const options = new RequestOptions({
       headers: headers
     });
-    this.http.post(environment.usersUrl + 'signup', userData, options).subscribe(res => {
-      if (res) {
-        this.router.navigate(['/performance']);
-      }
-    });
+    return this.http.post(environment.usersUrl + 'signup', userData, options);
   }
 
 }

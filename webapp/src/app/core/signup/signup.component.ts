@@ -3,6 +3,7 @@ import { FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 import { PasswordValidator } from '../../shared/validators/password.validator';
 import { SignupService } from 'src/app/common/signup.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
@@ -13,8 +14,10 @@ import { SignupService } from 'src/app/common/signup.service';
 export class SignupComponent implements OnInit {
 
   signupForm: FormGroup;
-
   matchingPasswordsGroup: FormGroup;
+
+  hasError = false;
+  errorMessage;
 
   accountValidationMessages = {
     'firstName': [
@@ -38,7 +41,7 @@ export class SignupComponent implements OnInit {
     ]
   }
 
-  constructor(private fb: FormBuilder, private signupService: SignupService) { }
+  constructor(private fb: FormBuilder, private signupService: SignupService, private router: Router) { }
 
   ngOnInit() {
     this.createForm();
@@ -69,10 +72,14 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmit(form) {
-    console.log(form);
     const value = form.value;
     value.password = value.matchingPasswords.createPassword;
     delete value.matchingPasswords;
-    this.signupService.signup(form.value);
+    this.signupService.signup(form.value).subscribe(
+      data => this.router.navigate(['/performance']),
+      err => {
+        this.hasError = true;
+        this.errorMessage = err.json().error;
+    });
   }
 }

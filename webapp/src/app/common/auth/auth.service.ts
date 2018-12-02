@@ -15,27 +15,28 @@ export class AuthService {
 
   constructor(private http: Http, private router: Router) {
     if (this.isAuthorized()) {
-      console.log('aith');
-      console.log(this.getAuth());
       this.getUserInfo();
     } else {
       this.router.navigate(['/signup']);
     }
   }
 
-  public login(username: string, password: string) {
+  public login(username: string, password: string): Promise<any> {
     const body = {
       username: username,
       password: password
     };
-    this.http.post(environment.usersUrl + 'login', body).subscribe(user => {
-      if (user) {
-        this.user = <User>user.json();
-        localStorage.setItem(this.authStorageKey, btoa(username + ":" + password));
-        this.router.navigate(['/performance']);
-      }
-
-      return user;
+    return new Promise<any>((resolve) => {
+      this.http.post(environment.usersUrl + 'login', body).subscribe(
+        user => {
+          this.user = <User>user.json();
+          localStorage.setItem(this.authStorageKey, btoa(username + ":" + password));
+          resolve({success: true});
+        },
+        err => {
+          resolve(err.json());
+        },
+      );
     });
   }
 

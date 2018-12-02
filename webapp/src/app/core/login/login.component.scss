@@ -1,4 +1,4 @@
-app-login {
+:host(app-login) {
   .container {
     margin-top: 50px;
     .title {
@@ -20,7 +20,9 @@ app-login {
   }
 
   .error-message {
-    font-size: 12px;
+    font-size: 20px;
+    margin-top: 10px;
+    color: red;
   }
 
   .double-line-hint {

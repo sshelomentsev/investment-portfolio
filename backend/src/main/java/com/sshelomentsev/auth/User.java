@@ -19,7 +19,6 @@ public class User extends AbstractUser {
 
     @Override
     protected void doIsPermitted(String s, Handler<AsyncResult<Boolean>> handler) {
-        authProvider.hasPermission(s);
         handler.handle(Future.succeededFuture(true));
     }
 

@@ -3,6 +3,7 @@ package com.sshelomentsev.rest;
 import com.sshelomentsev.arangodb.Database;
 import com.sshelomentsev.auth.RxAuthProvider;
 import com.sshelomentsev.auth.UserAuthProvider;
+import com.sshelomentsev.model.AsyncResultFailure;
 import com.sshelomentsev.model.UserProfile;
 import com.sshelomentsev.service.UserService;
 import com.sshelomentsev.service.InvestmentService;
@@ -29,13 +30,13 @@ public class RestService extends AbstractVerticle {
 
     private InvestmentService investmentService;
     private StatisticsService statisticsService;
-    private UserService authService;
+    private UserService userService;
     private Database db;
 
-    public RestService(InvestmentService investmentService, StatisticsService statisticsService, UserService authService, Database db) {
+    public RestService(InvestmentService investmentService, StatisticsService statisticsService, UserService userService, Database db) {
         this.investmentService = investmentService;
         this.statisticsService = statisticsService;
-        this.authService = authService;
+        this.userService = userService;
         this.db = db;
     }
 
@@ -87,7 +88,7 @@ public class RestService extends AbstractVerticle {
     }
 
     private Handler<RoutingContext> createGetUserProfileHandler() {
-        return ctx -> authService.getUserProfile(ctx.user().principal().getString("_id"),
+        return ctx -> userService.getUserProfile(ctx.user().principal().getString("_id"),
                 event -> processJsonResponse(ctx, event));
     }
 
@@ -95,8 +96,7 @@ public class RestService extends AbstractVerticle {
         return ctx -> {
             try {
                 UserProfile profile = ctx.getBodyAsJson().mapTo(UserProfile.class);
-                System.out.println(ctx.getBodyAsJson().encodePrettily());
-                authService.createUser(profile, event -> processJsonResponse(ctx, event));
+                userService.createUser(profile, event -> processJsonResponse(ctx, event));
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 ctx.response().setStatusCode(400).end();
@@ -110,7 +110,10 @@ public class RestService extends AbstractVerticle {
                 ctx.response().putHeader("Content-type", "application/json")
                         .end(res.result().principal().encodePrettily());
             } else {
-                ctx.response().setStatusCode(401).end();
+                res.cause().printStackTrace();
+                ctx.response().setStatusCode(401)
+                        .end(new JsonObject().put("success", false).put("error", res.cause().getMessage())
+                                .encodePrettily());
             }
         });
     }
@@ -138,8 +141,8 @@ public class RestService extends AbstractVerticle {
         if (event.succeeded()) {
             ctx.response().putHeader("Content-type", "application/json").end(event.result().encodePrettily());
         } else {
-            event.cause().printStackTrace();
-            ctx.response().setStatusCode(400).end();
+            ctx.response().setStatusCode(400).putHeader("Content-tyoe", "application/json")
+                    .end(((AsyncResultFailure) event).errorResult().encodePrettily());
         }
     }
 

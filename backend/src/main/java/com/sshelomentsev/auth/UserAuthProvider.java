@@ -39,22 +39,19 @@ public class UserAuthProvider implements AuthProvider {
                         ret.remove("password");
                         future.complete(event.result().getJsonObject(0));
                     } else {
-                        future.fail("{'res': 'user in not correct}");
+                        future.fail("User or password are not correct");
                     }
                 } else {
-                    future.fail("{'res': 'Not auth'}");
+                    future.fail("Server error");
                 }
             });
         }, event -> {
             if (event.succeeded()) {
                 handler.handle(Future.succeededFuture(new User(this, (JsonObject) event.result())));
             } else {
-                handler.handle(Future.failedFuture("No"));
+                handler.handle(Future.failedFuture(event.cause().getMessage()));
             }
         });
     }
 
-    public void hasPermission(String permission) {
-
-    }
 }

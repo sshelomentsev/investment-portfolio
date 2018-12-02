@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
                     resultHandler.handle(new AsyncResultFailure<>("User with specified email is already exist"));
                 }
             } else {
-                resultHandler.handle(new AsyncResultFailure<>("Unable to finish user request"));
+                resultHandler.handle(new AsyncResultFailure<>("Server error"));
             }
         });
 
