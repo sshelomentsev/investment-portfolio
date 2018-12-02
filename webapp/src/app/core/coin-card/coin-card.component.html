@@ -6,7 +6,7 @@
         <mat-card-title>{{coin.currencyName}}</mat-card-title>
         <mat-card-subtitle>{{coin.currencyCode}}</mat-card-subtitle>
       </div>
-      <div *ngIf="coin.amountFiat > 0" class="staking-amount">
+      <div class="staking-amount">
         <mat-card-title>{{coin.rate | number: '1.0-2'}}</mat-card-title>
         <mat-card-subtitle>USD value</mat-card-subtitle>
       </div>

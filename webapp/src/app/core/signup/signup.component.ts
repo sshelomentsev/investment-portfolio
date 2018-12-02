@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { PasswordValidator, ParentErrorStateMatcher } from '../../shared/validators/password.validator';
+import { PasswordValidator } from '../../shared/validators/password.validator';
 import { SignupService } from 'src/app/common/signup.service';
 
 @Component({
@@ -15,8 +15,6 @@ export class SignupComponent implements OnInit {
   signupForm: FormGroup;
 
   matchingPasswordsGroup: FormGroup;
-
-  parentErrorStateMatcher = new ParentErrorStateMatcher();
 
   accountValidationMessages = {
     'firstName': [

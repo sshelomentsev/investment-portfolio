@@ -34,8 +34,7 @@
         </mat-form-field>
 
         <mat-form-field class="full-width">
-          <input matInput type="password" placeholder="Confirm password" formControlName="confirmPassword"
-            [errorStateMatcher]="parentErrorStateMatcher" required>
+          <input matInput type="password" placeholder="Confirm password" formControlName="confirmPassword" required>
           <mat-error *ngFor="let val of accountValidationMessages.createPassword">
             <mat-error class="error-message" *ngIf="signupForm.get('matchingPasswords').get('confirmPassword').hasError(val.type) && (signupForm.get('matchingPasswords').get('confirmPassword').dirty || signupForm.get('matchingPasswords').get('confirmPassword').touched)">{{val.message}}</mat-error>
           </mat-error>

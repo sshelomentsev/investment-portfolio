@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { map } from 'rxjs/operators';
+import { Http, Headers, RequestOptions } from '@angular/http';
 
 import { User } from '../../model/user.model';
 
@@ -16,6 +15,8 @@ export class AuthService {
 
   constructor(private http: Http, private router: Router) {
     if (this.isAuthorized()) {
+      console.log('aith');
+      console.log(this.getAuth());
       this.getUserInfo();
     } else {
       this.router.navigate(['/signup']);
@@ -57,7 +58,12 @@ export class AuthService {
   }
 
   private getUserInfo() {
-    this.http.get(environment.usersUrl + 'profile').subscribe(user => {
+    const headers = new Headers();
+    headers.append('Authorization', this.getAuth());
+    const options = new RequestOptions({
+      headers: headers
+    });
+    this.http.get(environment.usersUrl + 'profile', options).subscribe(user => {
       if (user) {
         this.user = <User>user.json();
       } else {
