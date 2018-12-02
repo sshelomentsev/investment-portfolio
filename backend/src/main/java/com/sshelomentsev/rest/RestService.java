@@ -61,6 +61,7 @@ public class RestService extends AbstractVerticle {
 
         router.route("/api/v1/*").handler(authHandler);
 
+
         router.post("/api/users/login").handler(createUserAuthHandler(provider));
         router.post("/api/users/logout").handler(ctx -> {
             ctx.clearUser();

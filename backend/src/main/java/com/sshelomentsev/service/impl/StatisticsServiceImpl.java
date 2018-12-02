@@ -1,8 +1,8 @@
 package com.sshelomentsev.service.impl;
 
 import com.sshelomentsev.arangodb.Database;
-import com.sshelomentsev.service.AsyncResultFailure;
-import com.sshelomentsev.service.AsyncResultSuccess;
+import com.sshelomentsev.model.AsyncResultFailure;
+import com.sshelomentsev.model.AsyncResultSuccess;
 import com.sshelomentsev.service.StatisticsService;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;

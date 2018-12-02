@@ -1,4 +1,4 @@
-package com.sshelomentsev.service;
+package com.sshelomentsev.model;
 
 import io.vertx.core.AsyncResult;
 

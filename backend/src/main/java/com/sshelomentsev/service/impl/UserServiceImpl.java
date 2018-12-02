@@ -2,10 +2,9 @@ package com.sshelomentsev.service.impl;
 
 import com.arangodb.util.MapBuilder;
 import com.sshelomentsev.arangodb.Database;
-import com.sshelomentsev.auth.User;
 import com.sshelomentsev.model.UserProfile;
-import com.sshelomentsev.service.AsyncResultFailure;
-import com.sshelomentsev.service.AsyncResultSuccess;
+import com.sshelomentsev.model.AsyncResultFailure;
+import com.sshelomentsev.model.AsyncResultSuccess;
 import com.sshelomentsev.service.UserService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

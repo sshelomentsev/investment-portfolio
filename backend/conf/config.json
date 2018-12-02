@@ -1,6 +1,6 @@
 {
   "db": {
-    "host": "db",
+    "host": "127.0.0.1",
     "port": 8529,
     "user": "investment",
     "password": "investment",
