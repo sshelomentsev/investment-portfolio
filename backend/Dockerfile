@@ -16,6 +16,9 @@ COPY target/$VERTICLE_FILE $VERTICLE_HOME/
 # Copy app config file
 COPY conf/config_docker.json $VERTICLE_HOME/config.json
 
+# Copy JWT kestore
+COPY keystore.jceks $VERTICLE_HOME/keystore.jceks
+
 # Launch the verticle
 WORKDIR $VERTICLE_HOME
 ENTRYPOINT ["sh", "-c"]
