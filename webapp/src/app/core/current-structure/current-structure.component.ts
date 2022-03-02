@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+
 
 import { DataService } from 'src/app/common/data.service';
 import { StakingCoin } from '../../model/staking-coin.model';

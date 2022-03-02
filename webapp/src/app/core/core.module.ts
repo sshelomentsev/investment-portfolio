@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 
 import { MomentModule } from 'ngx-moment';
 
-import { ChartsModule } from 'ng2-charts';
+import { NgChartsModule } from 'ng2-charts';
 
 import { throwIfAlreadyLoaded } from './module-import.guard';
 
@@ -36,7 +36,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
     MaterialModule,
     SharedModule,
     MomentModule,
-    ChartsModule
+    NgChartsModule
   ],
   exports: [
     NavigationComponent,

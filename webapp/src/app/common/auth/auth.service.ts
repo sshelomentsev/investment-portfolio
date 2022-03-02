@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { User } from '../../model/user.model';
 
@@ -15,7 +15,7 @@ export class AuthService {
 
   private user: User = undefined;
 
-  constructor(private http: Http, private router: Router, private cookieService: CookieService) {
+  constructor(private httpClient: HttpClient, private router: Router, private cookieService: CookieService) {
     this.hasAuth().then(isAuth => {
       if (!isAuth) {
         this.router.navigate([this.hasAuthKey() ? '/login' : '/signup']);
@@ -30,10 +30,10 @@ export class AuthService {
       username: username,
       password: password
     };
-    return new Promise<any>((resolve) => {
-      this.http.post(environment.usersUrl + 'login', body).subscribe(
+    return new Promise<any>((resolve) => {    
+      this.httpClient.post(environment.usersUrl + 'login', body).subscribe(
         user => {
-          this.user = <User>user.json();
+          this.user = <User>user;
           this.cookieService.set('token', this.user.token);
           resolve({success: true});
         },
@@ -52,7 +52,7 @@ export class AuthService {
   }
 
   public logout() {
-    this.http.post(environment.usersUrl + 'logout', {}).subscribe(s => {
+    this.httpClient.post(environment.usersUrl + 'logout', {}).subscribe(s => {
       this.user = undefined;
       this.cookieService.delete('token');
       this.router.navigate(['/login']);
@@ -93,12 +93,12 @@ export class AuthService {
   }
 
   private getUserInfo(): Observable<any> {
-    const headers = new Headers();
+    const headers = new HttpHeaders();
     headers.append('Authorization', this.getAuth());
-    const options = new RequestOptions({
+    const options = {
       headers: headers
-    });
-    return this.http.get(environment.usersUrl + 'profile', options);
+    };
+    return this.httpClient.get(environment.usersUrl + 'profile', options);
   }
 
 }

@@ -21,7 +21,7 @@ import { PeriodChangePipe } from './pipe/period-change.pipe';
 })
 
 export class SharedModule {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(): ModuleWithProviders<any> {
     return {
       ngModule: SharedModule,
       providers: []

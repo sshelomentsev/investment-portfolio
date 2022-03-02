@@ -85,8 +85,8 @@ export class LineChartComponent implements AfterViewInit {
       this.lineChartLabels = res[0].values.map(v => this.getLabel(v[0], period));
       if (undefined !== this.chart) {
         setTimeout(() => {
-          this.chart.ngOnDestroy();
-          this.chart.chart = this.chart.getChartBuilder(this.chart.ctx);
+          this.chart.ngOnDestroy();        
+          //this.chart.chart = this.chart.getChartBuilder(this.chart.ctx);
         }, 0);
       }
       this.ready = true;

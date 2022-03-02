@@ -8,8 +8,7 @@ import { AppComponent } from './app.component';
 import { AuthService } from './common/auth/auth.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
-import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 
 import { CoreModule } from './core/core.module';
 import { FundPerformanceComponent } from './fund-performance/fund-performance.component';
@@ -31,7 +30,7 @@ import { CookieService } from 'ngx-cookie-service';
     AppRoutingModule,
     SharedModule,
     CoreModule,
-    HttpModule,
+    HttpClientModule,
     HttpClientModule
   ],
   providers: [
